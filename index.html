@@ -4,27 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Duel Cerdas Matematika - Permainan Edukasi 2 Layar</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Menggunakan font Fredoka yang ramah anak -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* ==========================================================================
+           1. VARIABEL CSS & PENGATURAN TEMA
+           ========================================================================== */
         :root {
+            /* Tema Warna Utama */
             --bg-main: #f0f8ff;
-            --p1-color: #3b82f6; /* Blue */
-            --p1-light: #dbeafe;
-            --p2-color: #a855f7; /* Purple (Sesuai dengan tema baru) */
-            --p2-light: #f3e8ff;
-            --btn-color: #f59e0b; /* Orange/Yellow */
-            --btn-hover: #d97706;
             --text-dark: #1e293b;
             --text-light: #ffffff;
             --correct: #22c55e;
             --wrong: #ef4444;
+            --btn-color: #f59e0b;
+            --btn-hover: #d97706;
+            --gold: #fbbf24;
+
+            /* Warna Pemain 1 (Kiri - Biru) */
+            --p1-main: #3b82f6; 
+            --p1-light: #dbeafe;
+            --p1-dark: #1d4ed8;
+            --p1-border: #2563eb;
+
+            /* Warna Pemain 2 (Kanan - Ungu) */
+            --p2-main: #a855f7; 
+            --p2-light: #f3e8ff;
+            --p2-dark: #7e22ce;
+            --p2-border: #9333ea;
         }
 
+        /* ==========================================================================
+           2. RESET & PENGATURAN DASAR
+           ========================================================================== */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none; /* Prevent text selection while tapping */
+            user-select: none; /* Mencegah seleksi teks saat disentuh */
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -32,14 +49,17 @@
             font-family: 'Fredoka', sans-serif;
             background-color: var(--bg-main);
             color: var(--text-dark);
-            overflow: hidden; /* Prevent scrolling during gameplay */
+            overflow: hidden; /* Mencegah scrolling untuk pengalaman full-app */
             height: 100vh;
             width: 100vw;
+            touch-action: none; /* Mencegah gesture bawaan browser */
         }
 
-        /* Screen Management */
+        /* ==========================================================================
+           3. SISTEM LAYAR (SCREEN MANAGEMENT)
+           ========================================================================== */
         .screen {
-            display: none;
+            display: none; /* Sembunyikan semua layar secara default */
             width: 100%;
             height: 100%;
             flex-direction: column;
@@ -50,28 +70,41 @@
             left: 0;
             background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
             z-index: 10;
+            transition: opacity 0.5s ease;
         }
         .screen.active {
-            display: flex;
+            display: flex; /* Tampilkan hanya layar yang aktif */
+            animation: fadeIn 0.5s ease;
         }
 
-        /* Typography & Components */
-        h1 { font-size: 3rem; color: #ff6b6b; text-shadow: 2px 2px 0px #fff, 4px 4px 0px rgba(0,0,0,0.1); text-align: center; margin-bottom: 20px; line-height: 1.2;}
-        h2 { font-size: 2rem; margin-bottom: 15px; color: var(--text-dark);}
-        p { font-size: 1.2rem; margin-bottom: 20px; text-align: center; max-width: 600px; padding: 0 20px;}
+        /* ==========================================================================
+           4. TIPOGRAFI & KOMPONEN UI UMUM
+           ========================================================================== */
+        h1 { 
+            font-size: 3.5rem; 
+            color: #ff6b6b; 
+            text-shadow: 2px 2px 0px #fff, 4px 4px 0px rgba(0,0,0,0.1); 
+            text-align: center; 
+            margin-bottom: 20px; 
+            line-height: 1.2;
+        }
+        h2 { font-size: 2.5rem; margin-bottom: 15px; color: var(--text-dark);}
+        h3 { font-size: 1.8rem; margin-bottom: 10px; color: var(--text-dark);}
+        p { font-size: 1.2rem; margin-bottom: 20px; text-align: center; max-width: 600px; padding: 0 20px; line-height: 1.6;}
 
+        /* Desain Tombol 3D */
         button {
             font-family: 'Fredoka', sans-serif;
             font-size: 1.5rem;
             font-weight: 600;
-            padding: 15px 30px;
+            padding: 15px 35px;
             margin: 10px;
             border: none;
             border-radius: 50px;
             background-color: var(--btn-color);
             color: white;
             cursor: pointer;
-            box-shadow: 0 6px 0px #b45309;
+            box-shadow: 0 8px 0px var(--btn-hover);
             transition: all 0.1s ease;
             display: inline-flex;
             align-items: center;
@@ -79,183 +112,244 @@
             gap: 10px;
         }
         button:active {
-            transform: translateY(6px);
-            box-shadow: 0 0px 0px #b45309;
+            transform: translateY(8px);
+            box-shadow: 0 0px 0px var(--btn-hover);
         }
         button.secondary {
             background-color: #8b5cf6;
-            box-shadow: 0 6px 0px #5b21b6;
+            box-shadow: 0 8px 0px #5b21b6;
         }
-        button.secondary:active { box-shadow: 0 0px 0px #5b21b6; }
+        button.secondary:active { 
+            box-shadow: 0 0px 0px #5b21b6; 
+        }
+        button.danger {
+            background-color: var(--wrong);
+            box-shadow: 0 8px 0px #b91c1c;
+        }
+        button.danger:active { 
+            box-shadow: 0 0px 0px #b91c1c; 
+        }
+        button:disabled {
+            background-color: #cbd5e1;
+            box-shadow: 0 8px 0px #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         input, select {
             font-family: 'Fredoka', sans-serif;
-            font-size: 1.2rem;
-            padding: 10px 15px;
-            border: 3px solid #ddd;
-            border-radius: 15px;
+            font-size: 1.3rem;
+            padding: 12px 20px;
+            border: 4px solid #ddd;
+            border-radius: 20px;
             margin-bottom: 15px;
             width: 100%;
             max-width: 300px;
             text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: var(--btn-color);
         }
 
-        /* Audio Toggle */
-        #audio-toggle {
+        /* Top Bar & Audio Toggle */
+        .top-bar {
             position: absolute;
             top: 20px;
-            right: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+            pointer-events: none; /* Let clicks pass through empty areas */
+        }
+        .top-btn {
             font-size: 1.5rem;
             padding: 10px;
             border-radius: 50%;
             width: 60px;
             height: 60px;
-            z-index: 100;
+            pointer-events: auto;
+            box-shadow: 0 6px 0px rgba(0,0,0,0.2);
+            background: white;
+            color: var(--text-dark);
+        }
+        .top-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0px rgba(0,0,0,0.2);
         }
 
-        /* Container for Setup */
+        /* ==========================================================================
+           5. LAYAR SETUP (IDENTITAS PEMAIN)
+           ========================================================================== */
         .setup-container {
             display: flex;
             flex-wrap: wrap;
             gap: 40px;
             justify-content: center;
-            background: rgba(255,255,255,0.8);
-            padding: 30px;
+            background: rgba(255,255,255,0.9);
+            padding: 40px;
             border-radius: 30px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            max-width: 900px;
+            width: 95%;
         }
         .player-setup {
             display: flex;
             flex-direction: column;
             align-items: center;
             background: white;
-            padding: 20px;
-            border-radius: 20px;
-            border: 4px solid #ddd;
+            padding: 30px;
+            border-radius: 25px;
+            border: 6px solid #ddd;
+            flex: 1;
+            min-width: 280px;
         }
-        .player-setup.p1 { border-color: var(--p1-color); background: var(--p1-light); }
-        .player-setup.p2 { border-color: var(--p2-color); background: var(--p2-light); }
+        .player-setup.p1 { border-color: var(--p1-main); background: var(--p1-light); }
+        .player-setup.p2 { border-color: var(--p2-main); background: var(--p2-light); }
         
         .avatar-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
         .avatar-option {
-            font-size: 2.5rem;
+            font-size: 3rem;
             cursor: pointer;
-            padding: 5px;
-            border-radius: 10px;
-            border: 3px solid transparent;
+            padding: 10px;
+            border-radius: 15px;
+            border: 4px solid transparent;
             transition: all 0.2s;
+            background: rgba(255,255,255,0.5);
         }
-        .avatar-option.selected { border-color: var(--btn-color); background: white; transform: scale(1.1); }
+        .avatar-option:hover { background: white; transform: scale(1.05); }
+        .avatar-option.selected { 
+            border-color: var(--btn-color); 
+            background: white; 
+            transform: scale(1.15) rotate(-5deg); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
 
-        .mode-selector { margin-top: 20px; text-align: center; width: 100%; }
+        .mode-selector { margin-top: 30px; text-align: center; width: 100%; border-top: 2px dashed #ccc; padding-top: 20px;}
 
-        /* Micro-Learning */
+        /* ==========================================================================
+           6. MICRO-LEARNING
+           ========================================================================== */
         .learning-card {
             background: white;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 50px;
+            border-radius: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             text-align: center;
             max-width: 800px;
             display: none;
             flex-direction: column;
             align-items: center;
+            animation: slideUp 0.5s ease;
         }
         .learning-card.active { display: flex; }
-        .learning-visual { font-size: 3rem; margin: 20px 0; min-height: 100px; }
+        .learning-visual { 
+            font-size: 4rem; 
+            margin: 30px 0; 
+            min-height: 120px; 
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 20px;
+            border: 3px dashed #cbd5e1;
+        }
 
-        /* --- GAME ARENA (SPLIT SCREEN) --- */
+        /* ==========================================================================
+           7. ARENA PERMAINAN (SPLIT SCREEN KIRI & KANAN)
+           ========================================================================== */
         #game-arena {
             display: flex;
             flex-direction: row;
-            background: #1e293b; /* Warna garis batas vertikal yang tebal */
-            gap: 8px; /* Ketebalan garis belah tengah */
-            padding: 6px;
+            background: #0f172a; /* Garis batas vertikal yang tebal di tengah */
+            gap: 10px; /* Lebar celah pembatas tengah */
+            padding: 8px;
             width: 100%;
             height: 100%;
         }
+        
         .board {
             flex: 1;
             background: white;
-            border-radius: 15px;
+            border-radius: 20px;
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
             height: 100%;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
         }
-        .board.p1 { border: 6px solid var(--p1-color); background-color: #f8fafc; }
-        .board.p2 { border: 6px solid var(--p2-color); background-color: #faf5ff; }
+        .board.p1 { border: 8px solid var(--p1-border); background-color: #f8fafc; }
+        .board.p2 { border: 8px solid var(--p2-border); background-color: #faf5ff; }
 
-        /* Enforce Landscape Mode di Layar HP */
-        #landscape-prompt {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(30, 41, 59, 0.98);
-            color: white;
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 30px;
-        }
-        #landscape-prompt div { font-size: 5rem; margin-bottom: 20px; animation: pulse 2s infinite; }
-        #landscape-prompt h2 { color: white; margin-bottom: 15px; font-size: 2rem;}
-        #landscape-prompt p { font-size: 1.2rem; }
-        
-        @media (max-width: 768px) and (orientation: portrait) {
-            #landscape-prompt { display: flex; }
-        }
-
-        /* Inner Board UI */
+        /* UI Bagian Atas Papan Pemain */
         .board-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
-            background: rgba(0,0,0,0.05);
-            border-bottom: 2px solid rgba(0,0,0,0.1);
+            padding: 15px 25px;
+            background: rgba(0,0,0,0.03);
+            border-bottom: 3px solid rgba(0,0,0,0.05);
         }
-        .player-info { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1.2rem; }
-        .player-info .avatar { font-size: 2rem; }
-        .score-box { font-size: 1.5rem; font-weight: bold; color: var(--btn-color); background: white; padding: 5px 15px; border-radius: 20px; border: 2px solid #ddd; }
-        .progress-bar { height: 10px; background: #ddd; width: 100%; }
-        .progress-fill { height: 100%; background: var(--correct); width: 0%; transition: width 0.3s; }
-        .q-counter { text-align: center; font-weight: bold; font-size: 1.2rem; margin-top: 10px; color: #64748b; }
+        .player-info { display: flex; align-items: center; gap: 15px; font-weight: bold; font-size: 1.5rem; }
+        .player-info .avatar { font-size: 2.5rem; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));}
+        .score-box { 
+            font-size: 1.8rem; 
+            font-weight: bold; 
+            background: white; 
+            padding: 8px 20px; 
+            border-radius: 25px; 
+            border: 3px solid #ddd;
+            box-shadow: 0 4px 0px #ddd;
+        }
+        .board.p1 .score-box { color: var(--p1-main); border-color: var(--p1-light); box-shadow: 0 4px 0px var(--p1-light);}
+        .board.p2 .score-box { color: var(--p2-main); border-color: var(--p2-light); box-shadow: 0 4px 0px var(--p2-light);}
 
+        /* Indikator Progres Soal */
+        .progress-bar { height: 12px; background: #e2e8f0; width: 100%; }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .q-counter { text-align: center; font-weight: bold; font-size: 1.3rem; margin-top: 15px; color: #64748b; }
+
+        /* Area Soal dan Visualisasi */
         .question-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 15px;
         }
+        .equation-text { font-size: 4.5rem; font-weight: bold; margin-bottom: 10px; color: var(--text-dark); text-shadow: 2px 2px 0px rgba(0,0,0,0.1);}
+        
         .visual-math {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+            font-size: 3rem;
+            margin-bottom: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 10px;
-            min-height: 100px;
+            gap: 15px;
+            min-height: 120px;
         }
-        .object-group { display: flex; flex-wrap: wrap; justify-content: center; max-width: 250px; }
-        .math-symbol { font-size: 3rem; font-weight: bold; margin: 0 15px; }
-        .emoji { display: inline-block; transition: all 0.3s; }
+        .object-group { display: flex; flex-wrap: wrap; justify-content: center; max-width: 280px; gap: 5px; }
+        .math-symbol { font-size: 4rem; font-weight: bold; margin: 0 20px; color: #94a3b8;}
+        .emoji { 
+            display: inline-block; 
+            transition: transform 0.3s; 
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.15));
+        }
         
-        /* Subtraction Visuals */
+        /* Visualisasi Pengurangan (Bola dicoret) */
         .emoji.strike {
             position: relative;
-            opacity: 0.5;
+            opacity: 0.4;
+            transform: scale(0.9);
         }
         .emoji.strike::after {
             content: '❌';
@@ -263,29 +357,30 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 1.5rem;
+            font-size: 2rem;
+            opacity: 1;
         }
 
-        .equation-text { font-size: 3rem; font-weight: bold; margin-bottom: 20px; }
-
+        /* Pilihan Jawaban */
         .answers-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 20px;
             padding: 20px;
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
         }
         .answer-btn {
-            font-size: 2.5rem;
-            padding: 20px 10px;
-            border-radius: 20px;
-            box-shadow: 0 8px 0px rgba(0,0,0,0.2);
+            font-size: 3.5rem;
+            padding: 25px 10px;
+            border-radius: 25px;
+            box-shadow: 0 10px 0px rgba(0,0,0,0.2);
             width: 100%;
             margin: 0;
+            border: 4px solid rgba(255,255,255,0.3);
         }
 
-        /* Feedback Overlay */
+        /* Overlay Feedback (Benar/Salah) */
         .feedback-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -293,79 +388,189 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 5rem;
+            font-size: 7rem;
             z-index: 20;
-            background: rgba(255,255,255,0.9);
-            animation: popIn 0.3s ease-out;
+            background: rgba(255,255,255,0.95);
         }
-        .feedback-overlay.show { display: flex; }
-        .feedback-text { font-size: 2rem; font-weight: bold; margin-top: 10px; text-align: center; }
+        .feedback-overlay.show.correct { display: flex; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .feedback-overlay.show.wrong { display: flex; animation: shake 0.5s ease-in-out; }
+        .feedback-text { font-size: 2.5rem; font-weight: bold; margin-top: 15px; text-align: center; }
 
-        /* Animations */
-        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        
-        .timer-bar {
-            height: 5px; background: #e2e8f0; width: 100%; position: absolute; bottom: 0; left: 0;
-        }
-        .timer-fill {
-            height: 100%; background: var(--p1-color); width: 100%;
-        }
+        /* Timer Bar untuk Mode Cepat */
+        .timer-bar { height: 8px; background: #e2e8f0; width: 100%; position: absolute; bottom: 0; left: 0; }
+        .timer-fill { height: 100%; width: 100%; transition: width linear; }
 
-        /* Results Screen */
+        /* ==========================================================================
+           8. LAYAR HASIL AKHIR (WINNER & TROPHY)
+           ========================================================================== */
         .result-container {
-            background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center; max-width: 800px; width: 90%; z-index: 10;
+            background: white; 
+            padding: 50px; 
+            border-radius: 40px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            text-align: center; 
+            max-width: 900px; 
+            width: 95%; 
+            z-index: 10;
         }
-        .winner-title { font-size: 3rem; color: #f59e0b; margin-bottom: 20px; animation: pulse 1s infinite; }
-        .stats-grid { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; flex-wrap: wrap;}
+        .winner-title { font-size: 3.5rem; margin-bottom: 10px; }
+        
+        .stats-grid { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; flex-wrap: wrap;}
         .stat-card {
-            padding: 20px; border-radius: 20px; border: 4px solid #ddd; min-width: 200px;
+            padding: 30px; 
+            border-radius: 30px; 
+            border: 6px solid #ddd; 
+            min-width: 250px;
+            position: relative;
+            background: #fff;
         }
-        .stat-card.p1 { border-color: var(--p1-color); background: var(--p1-light); }
-        .stat-card.p2 { border-color: var(--p2-color); background: var(--p2-light); }
-        .stat-avatar { font-size: 4rem; }
-        .stat-score { font-size: 3rem; font-weight: bold; color: var(--text-dark); margin: 10px 0; }
-        .stat-details { font-size: 1.1rem; color: #555; }
+        .stat-card.p1 { border-color: var(--p1-light); }
+        .stat-card.p2 { border-color: var(--p2-light); }
+        .stat-avatar { font-size: 5rem; margin-bottom: 10px; display: inline-block;}
+        .stat-score { font-size: 4rem; font-weight: bold; color: var(--text-dark); margin: 15px 0; line-height: 1;}
+        .stat-details { font-size: 1.3rem; color: #64748b; line-height: 1.8; text-align: left; background: #f8fafc; padding: 15px; border-radius: 15px;}
+        
+        /* Sorotan Pemenang */
+        .winner-highlight {
+            border-color: var(--gold) !important;
+            box-shadow: 0 0 40px rgba(251, 191, 36, 0.6);
+            transform: scale(1.1);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: linear-gradient(to bottom, #fff, #fef3c7) !important;
+            z-index: 2;
+        }
+        .winner-highlight::before {
+            content: '🏆';
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            animation: float 2s infinite ease-in-out;
+        }
 
-        /* Confetti Canvas */
-        #confetti { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        /* ==========================================================================
+           9. MODAL / POPUP
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none; justify-content: center; align-items: center; z-index: 200;
+            backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
+        .modal-content {
+            background: white; padding: 40px; border-radius: 30px;
+            text-align: center; max-width: 500px;
+            animation: slideUp 0.3s ease;
+        }
 
+        /* ==========================================================================
+           10. LAYAR ROTASI PERANGKAT (ENFORCE LANDSCAPE)
+           ========================================================================== */
+        #landscape-prompt {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.98);
+            color: white;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+        #landscape-prompt .rotate-icon { font-size: 6rem; margin-bottom: 30px; animation: rotatePhone 2s infinite; }
+        #landscape-prompt h2 { color: white; font-size: 2.5rem; margin-bottom: 20px;}
+        
+        /* Hanya tampilkan peringatan di HP/Tablet dalam mode potret */
+        @media (max-width: 1024px) and (orientation: portrait) {
+            #landscape-prompt { display: flex; }
+        }
+
+        /* ==========================================================================
+           11. ANIMASI (KEYFRAMES)
+           ========================================================================== */
+        @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes slideUp { 0% { transform: translateY(50px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 80% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        @keyframes float { 0% { transform: translate(-50%, 0px); } 50% { transform: translate(-50%, -15px); } 100% { transform: translate(-50%, 0px); } }
+        @keyframes rotatePhone { 0% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } 100% { transform: rotate(-90deg); } }
+        @keyframes shake { 
+            0%, 100% { transform: translateX(0); } 
+            20%, 60% { transform: translateX(-15px); } 
+            40%, 80% { transform: translateX(15px); } 
+        }
+
+        /* Canvas Overlay untuk Partikel/Confetti */
+        #fx-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
     </style>
 </head>
 <body>
 
-    <!-- Landscape Prompt for Portrait Mobile -->
+    <!-- =======================================================================
+         PROMPT MODE LANDSCAPE
+         Memaksa pengguna memutar perangkat mobile mereka.
+         ======================================================================= -->
     <div id="landscape-prompt">
-        <div>🔄</div>
+        <div class="rotate-icon">📱➡️🔄</div>
         <h2>Putar Perangkat Anda</h2>
-        <p>Silakan putar HP atau Tablet Anda ke mode Mendatar (Landscape) agar kedua pemain bisa bermain berdampingan dari kiri dan kanan.</p>
+        <p>Permainan 2 Layar ini membutuhkan layar yang lebar. Silakan putar HP atau Tablet Anda ke posisi Mendatar (Landscape) agar kamu dan temanmu bisa bermain berdampingan dengan nyaman!</p>
     </div>
 
-    <!-- Audio Toggle Button (Global) -->
-    <button id="audio-toggle" onclick="toggleAudio()">🔊</button>
+    <!-- =======================================================================
+         GLOBAL TOP BAR (Navigasi Ekstra)
+         ======================================================================= -->
+    <div class="top-bar">
+        <button class="top-btn" id="btn-home" onclick="confirmExit()" style="display:none;">🏠</button>
+        <button class="top-btn" id="audio-toggle" onclick="toggleAudio()">🔊</button>
+    </div>
 
-    <!-- SCREEN 1: HOME -->
+    <!-- =======================================================================
+         MODAL KONFIRMASI KELUAR
+         ======================================================================= -->
+    <div class="modal-overlay" id="exit-modal">
+        <div class="modal-content">
+            <h2>Keluar Permainan?</h2>
+            <p>Apakah kamu yakin ingin berhenti duel? Permainan saat ini tidak akan disimpan.</p>
+            <div style="margin-top:20px;">
+                <button onclick="nav('home'); hideModal('exit-modal');">Ya, Keluar</button>
+                <button class="secondary" onclick="hideModal('exit-modal')">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         SCREEN 1: BERANDA (HOME)
+         ======================================================================= -->
     <div id="screen-home" class="screen active">
         <h1>DUEL CERDAS<br>MATEMATIKA</h1>
-        <div style="font-size: 5rem; margin-bottom: 20px; display: flex; gap: 20px;">
-            <div style="animation: pulse 2s infinite;">👦</div>
-            <div style="font-size: 3rem; align-self: center;">VS</div>
-            <div style="animation: pulse 2s infinite 1s;">👧</div>
+        <div style="font-size: 6rem; margin-bottom: 20px; display: flex; gap: 30px; align-items: center;">
+            <div style="animation: pulse 2s infinite; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));">👦</div>
+            <div style="font-size: 3.5rem; font-weight: bold; color: #f59e0b;">VS</div>
+            <div style="animation: pulse 2s infinite 1s; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));">👧</div>
         </div>
-        <p>Ayo bermain dan belajar matematika bersama temanmu! Siapa yang paling cepat dan tepat?</p>
-        <button onclick="nav('setup')">🎮 MULAI BERMAIN</button>
-        <button class="secondary" onclick="showTutorial()">📖 CARA BERMAIN</button>
+        <p>Ayo tantang temanmu! Siapa yang paling jago menghitung matematika?<br>Bermain bersama dalam 1 layar!</p>
+        <div>
+            <button onclick="nav('setup')" style="font-size: 1.8rem; padding: 20px 50px;">🎮 MULAI DUEL!</button>
+        </div>
+        <div>
+            <button class="secondary" onclick="showTutorial()">📖 Cara Bermain</button>
+        </div>
     </div>
 
-    <!-- SCREEN 2: SETUP -->
+    <!-- =======================================================================
+         SCREEN 2: SETUP (PILIH KARAKTER & MODE)
+         ======================================================================= -->
     <div id="screen-setup" class="screen">
-        <h2>Pilih Karaktermu!</h2>
+        <h2>Siapkan Pemain!</h2>
         <div class="setup-container">
-            <!-- P1 Setup -->
+            <!-- Pengaturan Pemain 1 -->
             <div class="player-setup p1">
-                <h3>Pemain 1</h3>
-                <input type="text" id="p1-name" value="Pemain Biru" placeholder="Nama Pemain 1" maxlength="12">
+                <h3 style="color: var(--p1-dark);">Pemain Kiri (1)</h3>
+                <input type="text" id="p1-name" value="Pemain Biru" placeholder="Nama Pemain 1" maxlength="10">
                 <div class="avatar-grid" id="p1-avatars">
                     <div class="avatar-option selected" onclick="selectAvatar('p1', '👦')">👦</div>
                     <div class="avatar-option" onclick="selectAvatar('p1', '👨‍🚀')">👨‍🚀</div>
@@ -374,10 +579,10 @@
                 </div>
             </div>
             
-            <!-- P2 Setup -->
+            <!-- Pengaturan Pemain 2 -->
             <div class="player-setup p2">
-                <h3>Pemain 2</h3>
-                <input type="text" id="p2-name" value="Pemain Merah" placeholder="Nama Pemain 2" maxlength="12">
+                <h3 style="color: var(--p2-dark);">Pemain Kanan (2)</h3>
+                <input type="text" id="p2-name" value="Pemain Ungu" placeholder="Nama Pemain 2" maxlength="10">
                 <div class="avatar-grid" id="p2-avatars">
                     <div class="avatar-option selected" onclick="selectAvatar('p2', '👧')">👧</div>
                     <div class="avatar-option" onclick="selectAvatar('p2', '👸')">👸</div>
@@ -386,173 +591,230 @@
                 </div>
             </div>
 
+            <!-- Pemilihan Mode -->
             <div class="mode-selector">
-                <h3>Pilih Mode Permainan</h3>
+                <h3>Materi Duel</h3>
                 <select id="game-mode">
-                    <option value="add">➕ Duel Penjumlahan</option>
-                    <option value="sub">➖ Duel Pengurangan</option>
-                    <option value="mix">➕➖ Duel Campuran</option>
-                    <option value="speed">⚡ Duel Cepat (Campuran + Waktu)</option>
+                    <option value="add">➕ Duel Penjumlahan (Level 1)</option>
+                    <option value="sub">➖ Duel Pengurangan (Level 1)</option>
+                    <option value="mix">➕➖ Duel Campuran (Level 2)</option>
+                    <option value="speed">⚡ Duel Cepat (Waktu + Campuran)</option>
                 </select>
                 <br>
-                <button onclick="startLearning()" style="margin-top: 20px;">🚀 LANJUT</button>
-                <button class="secondary" onclick="nav('home')">Kembali</button>
+                <button onclick="startLearning()" style="margin-top: 20px; font-size: 1.8rem;">🚀 LANJUT</button>
             </div>
         </div>
     </div>
 
-    <!-- SCREEN 3: MICRO LEARNING -->
+    <!-- =======================================================================
+         SCREEN 3: MICRO LEARNING (PERSIAPAN SEBELUM MAIN)
+         ======================================================================= -->
     <div id="screen-learning" class="screen">
+        <!-- Belajar Penjumlahan -->
         <div class="learning-card active" id="learn-1">
-            <h2>Mengenal Penjumlahan</h2>
-            <div class="learning-visual">🍎🍎 + 🍎 = 🍎🍎🍎</div>
-            <p>Penjumlahan berarti menambahkan barang. 2 apel ditambah 1 apel menjadi 3 apel.</p>
-            <button onclick="nextLearning(2)">Lanjut</button>
+            <h2>Mengenal Penjumlahan ➕</h2>
+            <div class="learning-visual">🍎🍎 <span style="color:var(--correct);">+</span> 🍎 <span style="color:#64748b;">=</span> 🍎🍎🍎</div>
+            <p>Penjumlahan berarti menambahkan jumlah barang menjadi lebih banyak.<br><strong>2 apel</strong> ditambah <strong>1 apel</strong> menjadi total <strong>3 apel</strong>.</p>
+            <button onclick="nextLearning(2)">Mengerti! Lanjut ➡️</button>
         </div>
+        
+        <!-- Belajar Pengurangan -->
         <div class="learning-card" id="learn-2">
-            <h2>Mengenal Pengurangan</h2>
+            <h2>Mengenal Pengurangan ➖</h2>
             <div class="learning-visual">
                 <span class="emoji">🏀</span><span class="emoji">🏀</span><span class="emoji">🏀</span>
-                ➖ <span class="emoji strike">🏀</span>
-                = <span class="emoji">🏀</span><span class="emoji">🏀</span>
+                <span style="color:var(--wrong); margin:0 15px; font-weight:bold;">-</span> 
+                <span class="emoji strike">🏀</span>
+                <span style="color:#64748b; margin:0 15px; font-weight:bold;">=</span> 
+                <span class="emoji">🏀</span><span class="emoji">🏀</span>
             </div>
-            <p>Pengurangan berarti mengambil atau mengurangi barang. 3 bola dikurangi 1 bola sisa 2 bola.</p>
-            <button onclick="nextLearning(3)">Lanjut</button>
+            <p>Pengurangan berarti mengambil atau membuang sebagian barang.<br><strong>3 bola</strong> dikurangi <strong>1 bola</strong>, maka sisanya adalah <strong>2 bola</strong>.</p>
+            <button onclick="nextLearning(3)">Paham! Lanjut ➡️</button>
         </div>
+
+        <!-- Aturan Kemenangan -->
         <div class="learning-card" id="learn-3">
-            <h2>Aturan Permainan</h2>
-            <p style="text-align: left;">
-                ✅ Jawab 10 soal dengan benar.<br>
-                ✅ Jawaban benar dapat +10 poin.<br>
-                ✅ Jawab cepat dapat bonus +5 poin.<br>
-                ✅ Salah tidak dikurangi, jadi jangan takut mencoba!<br>
-            </p>
-            <div style="font-size: 4rem;">🏆</div>
-            <button onclick="startDuel()" style="background-color: var(--correct);">MULAI DUEL!</button>
+            <h2>Aturan Duel 🏆</h2>
+            <div style="display:flex; justify-content:center; gap: 30px; text-align:left; margin: 20px 0;">
+                <div>
+                    <p>✅ Setiap pemain mendapat <strong>10 soal</strong>.</p>
+                    <p>✅ Jawaban benar dapat <strong>+10 poin</strong>.</p>
+                    <p>✅ Jawab cepat dapat bonus <strong>+5 poin</strong>.</p>
+                </div>
+                <div>
+                    <p>❌ Salah tidak ada pengurangan skor.</p>
+                    <p>🏁 Siapa yang cepat selesai, dia yang menghentikan waktu!</p>
+                </div>
+            </div>
+            <p style="color: var(--wrong); font-weight: bold;">Ingat! Jika temanmu selesai 10 soal duluan, permainan akan langsung berakhir!</p>
+            <button onclick="startDuel()" style="background-color: var(--correct); font-size: 1.8rem;">🔥 MULAI DUEL SEKARANG!</button>
         </div>
     </div>
 
-    <!-- SCREEN 4: GAME ARENA (SPLIT SCREEN) -->
+    <!-- =======================================================================
+         SCREEN 4: ARENA PERMAINAN (SPLIT SCREEN)
+         ======================================================================= -->
     <div id="screen-game" class="screen">
+        <!-- Canvas untuk efek saat main (seperti bintang kecil) -->
+        <canvas id="fx-canvas"></canvas>
+
         <div id="game-arena">
             
-            <!-- PLAYER 1 BOARD -->
+            <!-- PAPAN PEMAIN 1 (KIRI) -->
             <div class="board p1" id="board-p1">
                 <div class="board-header">
                     <div class="player-info"><span class="avatar" id="avatar-p1">👦</span> <span id="name-p1">Pemain 1</span></div>
                     <div class="score-box">Skor: <span id="score-p1">0</span></div>
                 </div>
-                <div class="progress-bar"><div class="progress-fill" id="prog-p1"></div></div>
+                <div class="progress-bar"><div class="progress-fill" id="prog-p1" style="background: var(--p1-main);"></div></div>
                 <div class="q-counter" id="q-count-p1">Soal 1/10</div>
+                
                 <div class="question-area">
                     <div class="equation-text" id="eq-text-p1">? + ? =</div>
                     <div class="visual-math" id="visual-p1"></div>
                     <div class="answers-grid" id="answers-p1">
-                        <!-- Buttons injected via JS -->
+                        <!-- Tombol Jawaban diisi via JavaScript -->
                     </div>
                 </div>
+                
                 <div class="feedback-overlay" id="feedback-p1">
                     <div id="fb-icon-p1">✅</div>
                     <div class="feedback-text" id="fb-text-p1">Hebat!</div>
                 </div>
-                <div class="timer-bar" id="timer-bar-p1-container" style="display:none;"><div class="timer-fill" id="timer-p1" style="background:var(--p1-color);"></div></div>
+                <!-- Timer bar (Hanya muncul jika mode speed) -->
+                <div class="timer-bar" id="timer-bar-p1-container" style="display:none;"><div class="timer-fill" id="timer-p1" style="background:var(--p1-main);"></div></div>
             </div>
 
-            <!-- PLAYER 2 BOARD -->
+            <!-- PAPAN PEMAIN 2 (KANAN) -->
             <div class="board p2" id="board-p2">
                 <div class="board-header">
                     <div class="player-info"><span class="avatar" id="avatar-p2">👧</span> <span id="name-p2">Pemain 2</span></div>
-                    <div class="score-box" style="color: var(--p2-color);">Skor: <span id="score-p2">0</span></div>
+                    <div class="score-box">Skor: <span id="score-p2">0</span></div>
                 </div>
-                <div class="progress-bar"><div class="progress-fill" id="prog-p2" style="background: var(--p2-color);"></div></div>
+                <div class="progress-bar"><div class="progress-fill" id="prog-p2" style="background: var(--p2-main);"></div></div>
                 <div class="q-counter" id="q-count-p2">Soal 1/10</div>
+                
                 <div class="question-area">
                     <div class="equation-text" id="eq-text-p2">? + ? =</div>
                     <div class="visual-math" id="visual-p2"></div>
                     <div class="answers-grid" id="answers-p2">
-                        <!-- Buttons injected via JS -->
+                        <!-- Tombol Jawaban diisi via JavaScript -->
                     </div>
                 </div>
+                
                 <div class="feedback-overlay" id="feedback-p2">
                     <div id="fb-icon-p2">✅</div>
                     <div class="feedback-text" id="fb-text-p2">Hebat!</div>
                 </div>
-                <div class="timer-bar" id="timer-bar-p2-container" style="display:none;"><div class="timer-fill" id="timer-p2" style="background:var(--p2-color);"></div></div>
+                <!-- Timer bar (Hanya muncul jika mode speed) -->
+                <div class="timer-bar" id="timer-bar-p2-container" style="display:none;"><div class="timer-fill" id="timer-p2" style="background:var(--p2-main);"></div></div>
             </div>
 
         </div>
     </div>
 
-    <!-- SCREEN 5: RESULTS -->
+    <!-- =======================================================================
+         SCREEN 5: HASIL AKHIR (PENGUMUMAN PEMENANG)
+         ======================================================================= -->
     <div id="screen-result" class="screen">
-        <canvas id="confetti"></canvas>
         <div class="result-container">
-            <h1 class="winner-title" id="result-title">SERI!</h1>
-            <p id="result-subtitle" style="font-size: 1.5rem; font-weight: bold;">Permainan yang luar biasa!</p>
+            <div id="winner-display" style="font-size: 6rem; margin-bottom: 5px;">🏆</div>
+            <h1 class="winner-title" id="result-title">HASIL SERI!</h1>
+            <p id="result-subtitle" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 30px; color: var(--text-dark);">Kalian berdua luar biasa!</p>
             
             <div class="stats-grid">
-                <div class="stat-card p1">
+                <!-- Statistik Pemain 1 -->
+                <div class="stat-card p1" id="stat-card-p1">
                     <div class="stat-avatar" id="res-av-p1">👦</div>
-                    <div id="res-name-p1" style="font-weight: bold; font-size: 1.2rem;">Pemain 1</div>
+                    <div id="res-name-p1" style="font-weight: bold; font-size: 1.5rem; color: var(--p1-dark);">Pemain 1</div>
                     <div class="stat-score" id="res-score-p1">0</div>
                     <div class="stat-details">
-                        Benar: <span id="res-cor-p1" style="color:var(--correct)">0</span><br>
-                        Salah: <span id="res-wro-p1" style="color:var(--wrong)">0</span>
+                        ✅ Benar: <span id="res-cor-p1" style="color:var(--correct); font-weight:bold; float:right;">0</span><br>
+                        ❌ Salah: <span id="res-wro-p1" style="color:var(--wrong); font-weight:bold; float:right;">0</span><br>
+                        ⏭️ Terlewat: <span id="res-un-p1" style="color:#64748b; font-weight:bold; float:right;">0</span>
                     </div>
                 </div>
                 
-                <div class="stat-card p2">
+                <!-- Statistik Pemain 2 -->
+                <div class="stat-card p2" id="stat-card-p2">
                     <div class="stat-avatar" id="res-av-p2">👧</div>
-                    <div id="res-name-p2" style="font-weight: bold; font-size: 1.2rem;">Pemain 2</div>
+                    <div id="res-name-p2" style="font-weight: bold; font-size: 1.5rem; color: var(--p2-dark);">Pemain 2</div>
                     <div class="stat-score" id="res-score-p2">0</div>
                     <div class="stat-details">
-                        Benar: <span id="res-cor-p2" style="color:var(--correct)">0</span><br>
-                        Salah: <span id="res-wro-p2" style="color:var(--wrong)">0</span>
+                        ✅ Benar: <span id="res-cor-p2" style="color:var(--correct); font-weight:bold; float:right;">0</span><br>
+                        ❌ Salah: <span id="res-wro-p2" style="color:var(--wrong); font-weight:bold; float:right;">0</span><br>
+                        ⏭️ Terlewat: <span id="res-un-p2" style="color:#64748b; font-weight:bold; float:right;">0</span>
                     </div>
                 </div>
             </div>
 
-            <button onclick="nav('setup')" style="background-color: var(--correct);">🔄 MAIN LAGI</button>
-            <button class="secondary" onclick="nav('home')">🏠 BERANDA</button>
+            <div style="display:flex; justify-content:center; gap: 15px; flex-wrap:wrap;">
+                <button onclick="nav('setup')" style="background-color: var(--correct); font-size: 1.5rem;">🔄 TANDING ULANG</button>
+                <button class="secondary" onclick="nav('home')">🏠 KEMBALI KE MENU</button>
+            </div>
         </div>
     </div>
 
+    <!-- =======================================================================
+         KODE JAVASCRIPT UTAMA
+         ======================================================================= -->
     <script>
-        /* --- GLOBAL STATE --- */
+        /**
+         * STATE GLOBAL PERMAINAN
+         * Menyimpan seluruh pengaturan dan status yang sedang berjalan.
+         */
         let audioEnabled = true;
         const TOTAL_QUESTIONS = 10;
-        const EMOJIS = ['🍎', '🍊', '🍓', '🍇', '🍉', '⚽', '🏀', '⭐', '🍬', '🍩'];
         
-        const PRAISE = ["Waaah, hebat sekali!", "Benar! Kamu pintar!", "Luar biasa!", "Yeee! Kamu berhasil!", "Tepat sekali!"];
-        const ENCOURAGE = ["Ups, belum tepat!", "Ayo coba lagi, kamu pasti bisa!", "Tidak apa-apa, tetap semangat!", "Hampir benar!"];
-
-        let gameMode = 'mix'; // add, sub, mix, speed
+        // Kumpulan Emoji untuk Benda Konkret
+        const EMOJIS = ['🍎', '🍊', '🍓', '🍉', '⚽', '🏀', '⭐', '🍬', '🍩', '🚗', '🧸', '🎈'];
         
-        let p1 = { id: 'p1', name: '', avatar: '', score: 0, correct: 0, wrong: 0, qIndex: 0, questions: [], active: false, timer: null, qStartTime: 0 };
-        let p2 = { id: 'p2', name: '', avatar: '', score: 0, correct: 0, wrong: 0, qIndex: 0, questions: [], active: false, timer: null, qStartTime: 0 };
+        // Kumpulan Variasi Suara Narasi (Dinamis agar tidak membosankan)
+        const PRAISE = ["Waaah, hebat sekali!", "Benar! Kamu pintar!", "Luar biasa!", "Yeee! Kamu berhasil!", "Tepat sekali!", "Kamu juara!"];
+        const ENCOURAGE = ["Ups, belum tepat!", "Ayo coba lagi, kamu pasti bisa!", "Tidak apa-apa, tetap semangat!", "Hampir benar!", "Ayo berhitung lebih teliti."];
 
-        /* --- AUDIO SYSTEM --- */
+        let gameMode = 'mix'; // Mode Default: add, sub, mix, speed
+        
+        // Data Struktur untuk masing-masing Pemain
+        const createPlayer = (id) => ({ 
+            id: id, name: '', avatar: '', score: 0, correct: 0, wrong: 0, 
+            qIndex: 0, questions: [], active: false, qStartTime: 0 
+        });
+
+        let p1 = createPlayer('p1');
+        let p2 = createPlayer('p2');
+        
+        let gameEnded = false;
+        let finalScreenShown = false;
+
+        /**
+         * =====================================================================
+         * SISTEM AUDIO & WEB SPEECH API
+         * Mengatur Sound Effects sintesis dan Voice Over narator.
+         * =====================================================================
+         */
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
+        /** Inisialisasi Audio Context setelah interaksi pertama pengguna */
         function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new AudioContext();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
+        /** Toggle (Hidup/Mati) Global Audio */
         function toggleAudio() {
             audioEnabled = !audioEnabled;
             document.getElementById('audio-toggle').innerText = audioEnabled ? '🔊' : '🔇';
             if (audioEnabled) {
                 initAudio();
-                playTone(400, 'sine', 0.1);
+                playTone(400, 'sine', 0.1); // Bunyi feedback klik
+            } else {
+                window.speechSynthesis.cancel(); // Matikan suara yang sedang bicara
             }
         }
 
+        /** Generator Nada Sederhana (Oscillator) untuk Efek Suara */
         function playTone(freq, type, duration, vol = 0.1) {
             if (!audioEnabled || !audioCtx) return;
             try {
@@ -566,27 +828,58 @@
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + duration);
-            } catch (e) { console.warn("Audio error", e); }
+            } catch (e) { console.warn("Audio Context error", e); }
         }
 
+        /** Efek Suara Saat Jawaban Benar (Ting-Ting) */
         function playCorrectSound() {
             playTone(600, 'sine', 0.1);
             setTimeout(() => playTone(800, 'sine', 0.2), 100);
         }
 
+        /** Efek Suara Saat Jawaban Salah (Buzzer rendah) */
         function playWrongSound() {
             playTone(300, 'sawtooth', 0.1);
             setTimeout(() => playTone(200, 'sawtooth', 0.3), 100);
         }
         
+        /** Efek Suara Kemenangan (Melodi Ceria & Denting Piala) */
         function playWinSound() {
-            playTone(400, 'square', 0.1);
-            setTimeout(() => playTone(500, 'square', 0.1), 150);
-            setTimeout(() => playTone(600, 'square', 0.1), 300);
-            setTimeout(() => playTone(800, 'square', 0.4), 450);
+            if(!audioEnabled) return;
+            const melody = [400, 500, 600, 800];
+            melody.forEach((freq, idx) => {
+                setTimeout(() => playTone(freq, 'square', 0.15), idx * 150);
+            });
+            setTimeout(() => playTone(1200, 'sine', 0.8), 600); // Suara "Ting!" Piala Emas
+        }
+        
+        /** Sintesis Suara Tepuk Tangan Sederhana dengan White Noise */
+        function playApplause() {
+            if (!audioEnabled || !audioCtx) return;
+            const bufferSize = audioCtx.sampleRate * 2.5; // 2.5 detik
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const bandpass = audioCtx.createBiquadFilter();
+            bandpass.type = 'bandpass';
+            bandpass.frequency.value = 1000;
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 2.5);
+            noise.connect(bandpass);
+            bandpass.connect(gain);
+            gain.connect(audioCtx.destination);
+            noise.start();
         }
 
-        // Speech Synthesis with simple Queue
+        /** 
+         * Sistem Antrean Web Speech API (Narasi Suara) 
+         * Memastikan narasi tidak tumpang tindih.
+         */
         let speechQueue = [];
         let isSpeaking = false;
 
@@ -601,41 +894,65 @@
             isSpeaking = true;
             const text = speechQueue.shift();
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'id-ID';
+            utterance.lang = 'id-ID'; // Bahasa Indonesia
             utterance.rate = 1.0;
-            utterance.pitch = 1.1;
+            utterance.pitch = 1.1; // Sedikit tinggi agar terdengar ramah anak
             
-            utterance.onend = () => {
-                isSpeaking = false;
-                processSpeechQueue();
-            };
-            utterance.onerror = () => {
-                isSpeaking = false;
-                processSpeechQueue();
-            };
+            utterance.onend = () => { isSpeaking = false; processSpeechQueue(); };
+            utterance.onerror = () => { isSpeaking = false; processSpeechQueue(); };
             
             window.speechSynthesis.speak(utterance);
         }
 
-        /* --- NAVIGATION --- */
+        /**
+         * =====================================================================
+         * SISTEM NAVIGASI & MODAL
+         * =====================================================================
+         */
         function nav(screenId) {
-            initAudio(); // Initialize audio context on first user interaction
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            initAudio(); 
+            // Kelola Tampilan Tombol Home di Top-bar
+            const homeBtn = document.getElementById('btn-home');
+            if(screenId === 'game') {
+                homeBtn.style.display = 'block';
+            } else if (screenId === 'home') {
+                homeBtn.style.display = 'none';
+            }
+
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.remove('active');
+            });
             document.getElementById('screen-' + screenId).classList.add('active');
             
-            if (screenId === 'home') speak("Selamat datang di Duel Cerdas Matematika!");
+            if (screenId === 'home') {
+                speak("Selamat datang di Duel Cerdas Matematika! Ayo bermain bersama!");
+            }
         }
 
-        function showTutorial() {
-            nav('learning');
-            document.querySelectorAll('.learning-card').forEach(c => c.classList.remove('active'));
-            document.getElementById('learn-1').classList.add('active');
-            speak("Mari belajar penjumlahan. Penjumlahan berarti menambahkan barang.");
+        function confirmExit() {
+            initAudio();
+            document.getElementById('exit-modal').classList.add('active');
         }
 
-        /* --- SETUP LOGIC --- */
+        function hideModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        /**
+         * =====================================================================
+         * SETUP PEMAIN & PENYIMPANAN LOCALSTORAGE
+         * =====================================================================
+         */
         let avatarsP1 = '👦';
         let avatarsP2 = '👧';
+
+        // Load data nama sebelumnya jika ada
+        window.onload = () => {
+            const savedP1 = localStorage.getItem('dcm_p1_name');
+            const savedP2 = localStorage.getItem('dcm_p2_name');
+            if (savedP1) document.getElementById('p1-name').value = savedP1;
+            if (savedP2) document.getElementById('p2-name').value = savedP2;
+        };
 
         function selectAvatar(player, avatar) {
             initAudio();
@@ -647,11 +964,27 @@
             if (player === 'p2') avatarsP2 = avatar;
         }
 
+        /**
+         * =====================================================================
+         * ALUR MICRO-LEARNING (TUTORIAL SEBELUM BERMAIN)
+         * =====================================================================
+         */
+        function showTutorial() {
+            nav('learning');
+            document.querySelectorAll('.learning-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('learn-1').classList.add('active');
+            speak("Mari belajar penjumlahan terlebih dahulu. Penjumlahan berarti barangnya bertambah banyak.");
+        }
+
         function startLearning() {
             initAudio();
-            // Read inputs
-            p1.name = document.getElementById('p1-name').value || 'Pemain 1';
-            p2.name = document.getElementById('p2-name').value || 'Pemain 2';
+            
+            // Ambil dan simpan nama ke state & localStorage
+            p1.name = document.getElementById('p1-name').value.trim() || 'Pemain 1';
+            p2.name = document.getElementById('p2-name').value.trim() || 'Pemain 2';
+            localStorage.setItem('dcm_p1_name', p1.name);
+            localStorage.setItem('dcm_p2_name', p2.name);
+            
             p1.avatar = avatarsP1;
             p2.avatar = avatarsP2;
             gameMode = document.getElementById('game-mode').value;
@@ -663,14 +996,25 @@
             initAudio();
             playTone(400, 'sine', 0.1);
             document.querySelectorAll('.learning-card').forEach(c => c.classList.remove('active'));
-            document.getElementById('learn-' + step).classList.add('active');
+            const nextCard = document.getElementById('learn-' + step);
+            if(nextCard) nextCard.classList.add('active');
             
-            if (step === 2) speak("Mari belajar pengurangan. Pengurangan berarti mengambil barang.");
-            if (step === 3) speak("Aturan permainan. Jawab dengan cepat dan tepat. Semoga berhasil!");
+            if (step === 2) speak("Sekarang belajar pengurangan. Pengurangan berarti barangnya diambil atau dibuang.");
+            if (step === 3) speak("Perhatikan aturan mainnya. Jawab dengan cepat dan tepat. Siapa cepat dia menang!");
         }
 
-        /* --- GAME LOGIC --- */
+        /**
+         * =====================================================================
+         * INTI PERMAINAN (LOGIKA MATEMATIKA & GAMEPLAY)
+         * =====================================================================
+         */
         
+        /**
+         * Menghasilkan kumpulan soal matematika acak dan unik.
+         * Dipastikan bilangan cacah dan hasil tidak lebih dari 20.
+         * @param {number} count - Jumlah soal
+         * @param {string} mode - add, sub, mix, speed
+         */
         function generateMathQuestions(count, mode) {
             let questions = [];
             for (let i = 0; i < count; i++) {
@@ -681,28 +1025,28 @@
 
                 let a, b, ans, op;
                 if (currentMode === 'add') {
-                    ans = Math.floor(Math.random() * 18) + 2; // ans between 2 and 19
-                    a = Math.floor(Math.random() * (ans - 1)) + 1; // a >= 1
+                    ans = Math.floor(Math.random() * 18) + 2; // Jawaban: 2 s.d 19
+                    a = Math.floor(Math.random() * (ans - 1)) + 1; // A >= 1
                     b = ans - a;
                     op = '+';
                 } else {
-                    a = Math.floor(Math.random() * 15) + 5; // a between 5 and 19
-                    b = Math.floor(Math.random() * (a - 1)) + 1; // b >=1, b < a
+                    a = Math.floor(Math.random() * 15) + 5; // A: 5 s.d 19
+                    b = Math.floor(Math.random() * (a - 1)) + 1; // B >=1, B < A
                     ans = a - b;
                     op = '-';
                 }
 
-                // Generate wrong answers
+                // Bangun jawaban salah pengecoh yang realistis
                 let options = new Set([ans]);
                 while (options.size < 4) {
-                    let wrong = ans + (Math.floor(Math.random() * 7) - 3); // ans +/- 3
+                    let wrong = ans + (Math.floor(Math.random() * 7) - 3); // tebakan sekitar +/- 3
                     if (wrong >= 0 && wrong <= 20 && wrong !== ans) {
                         options.add(wrong);
                     }
                 }
                 
                 let optionsArr = Array.from(options);
-                // Shuffle
+                // Acak urutan opsi jawaban (Fisher-Yates Shuffle)
                 for (let j = optionsArr.length - 1; j > 0; j--) {
                     const k = Math.floor(Math.random() * (j + 1));
                     [optionsArr[j], optionsArr[k]] = [optionsArr[k], optionsArr[j]];
@@ -716,90 +1060,116 @@
             return questions;
         }
 
+        /** Memulai Siklus Permainan Baru */
         function startDuel() {
             initAudio();
-            // Reset players
+            gameEnded = false;
+            finalScreenShown = false;
+            
+            // Hentikan sisa suara dari menu sebelumnya
+            window.speechSynthesis.cancel();
+            speechQueue = [];
+            
+            // Reset Data & UI Pemain
             const resetPlayer = (p) => {
-                p.score = 0; p.correct = 0; p.wrong = 0; p.qIndex = 0; p.active = true;
+                p.score = 0; p.correct = 0; p.wrong = 0; p.qIndex = 0; p.active = false;
                 p.questions = generateMathQuestions(TOTAL_QUESTIONS, gameMode);
+                
                 document.getElementById(`score-${p.id}`).innerText = "0";
                 document.getElementById(`prog-${p.id}`).style.width = "0%";
                 document.getElementById(`name-${p.id}`).innerText = p.name;
                 document.getElementById(`avatar-${p.id}`).innerText = p.avatar;
                 
+                // Siapkan Tampilan Timer jika mode kecepatan
                 if(gameMode === 'speed') {
                     document.getElementById(`timer-bar-${p.id}-container`).style.display = 'block';
                 } else {
                     document.getElementById(`timer-bar-${p.id}-container`).style.display = 'none';
                 }
+
+                // Tampilan Standby sebelum mulai
+                document.getElementById(`eq-text-${p.id}`).innerText = "Bersiap!";
+                document.getElementById(`visual-${p.id}`).innerHTML = "";
+                document.getElementById(`answers-${p.id}`).innerHTML = "";
             };
             
             resetPlayer(p1);
             resetPlayer(p2);
 
             nav('game');
-            speak(`Duel dimulai! ${p1.name} melawan ${p2.name}. Tiga, dua, satu, mulai!`);
+            speak(`Duel Cerdas dimulai! ${p1.name} melawan ${p2.name}. Bersiap... Mulai!`);
             
+            // Beri waktu 2 detik untuk pemain bersiap, lalu load soal pertama
             setTimeout(() => {
-                loadQuestion(p1);
-                loadQuestion(p2);
-            }, 3000); // 3 sec delay for countdown simulation
+                if(!gameEnded) {
+                    p1.active = true;
+                    p2.active = true;
+                    loadQuestion(p1);
+                    loadQuestion(p2);
+                }
+            }, 2500); 
         }
 
+        /** 
+         * Membuat Struktur HTML Benda Konkret 
+         * @param {number} num - Total benda
+         * @param {string} emoji - Icon benda
+         * @param {number} strike - Jumlah yang dicoret (untuk pengurangan)
+         */
         function renderVisualObjects(num, emoji, strike = 0) {
             let html = '<div class="object-group">';
             for (let i = 0; i < num; i++) {
                 if (i >= num - strike) {
-                    html += `<span class="emoji strike">${emoji}</span>`;
+                    html += `<span class="emoji strike">${emoji}</span>`; // Dicoret
                 } else {
-                    html += `<span class="emoji">${emoji}</span>`;
+                    html += `<span class="emoji">${emoji}</span>`; // Normal
                 }
             }
             html += '</div>';
             return html;
         }
 
+        /** Merender Soal ke dalam Layar Pemain */
         function loadQuestion(p) {
-            if (p.qIndex >= TOTAL_QUESTIONS) {
-                p.active = false;
-                showPlayerWait(p);
-                checkGameEnd();
-                return;
-            }
+            if (gameEnded || !p.active) return;
 
             const q = p.questions[p.qIndex];
             p.qStartTime = Date.now();
 
-            // Update Progress
+            // Update Progress Bar
             document.getElementById(`prog-${p.id}`).style.width = `${(p.qIndex / TOTAL_QUESTIONS) * 100}%`;
             document.getElementById(`q-count-${p.id}`).innerText = `Soal ${p.qIndex + 1}/${TOTAL_QUESTIONS}`;
 
-            // Text Equation
+            // Teks Persamaan
             document.getElementById(`eq-text-${p.id}`).innerText = `${q.a} ${q.op} ${q.b} = ?`;
 
-            // Visual Equation
+            // Visualisasi Benda Konkret
             const visContainer = document.getElementById(`visual-${p.id}`);
             if (q.op === '+') {
-                visContainer.innerHTML = renderVisualObjects(q.a, q.emoji) + `<span class="math-symbol">+</span>` + renderVisualObjects(q.b, q.emoji);
+                // Tampilkan Grup A + Grup B
+                visContainer.innerHTML = renderVisualObjects(q.a, q.emoji) + 
+                                         `<span class="math-symbol">+</span>` + 
+                                         renderVisualObjects(q.b, q.emoji);
             } else {
-                // Subtraction: show 'a' objects, strike out 'b' objects
+                // Tampilkan Grup A total, dan coret sejumlah B
                 visContainer.innerHTML = renderVisualObjects(q.a, q.emoji, q.b);
             }
 
-            // Answers
+            // Tombol Jawaban
             const ansContainer = document.getElementById(`answers-${p.id}`);
             ansContainer.innerHTML = '';
             q.options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn';
-                // Assign player specific color class for better UI
-                btn.style.backgroundColor = p.id === 'p1' ? 'var(--p1-color)' : 'var(--p2-color)';
+                // Warna background disesuaikan dengan warna tema pemain
+                btn.style.backgroundColor = p.id === 'p1' ? 'var(--p1-main)' : 'var(--p2-main)';
+                btn.style.boxShadow = `0 8px 0px ${p.id === 'p1' ? 'var(--p1-dark)' : 'var(--p2-dark)'}`;
                 btn.innerText = opt;
                 
-                // Touch/Click event
+                // Menangani Click atau Touch
                 const handleTap = (e) => {
                     e.preventDefault();
-                    if(!p.active) return;
+                    if(!p.active) return; // Mencegah double tap cepat
                     checkAnswer(p, opt, q.ans);
                 };
                 
@@ -809,189 +1179,310 @@
                 ansContainer.appendChild(btn);
             });
 
-            // Start timer animation if speed mode
+            // Animasi Timer untuk Mode Cepat
             if (gameMode === 'speed') {
                 const tf = document.getElementById(`timer-${p.id}`);
-                tf.style.transition = 'none';
+                tf.style.transition = 'none'; // Reset animasi
                 tf.style.width = '100%';
-                // Force reflow
-                void tf.offsetWidth;
-                tf.style.transition = 'width 10s linear';
+                void tf.offsetWidth; // Paksa perenderan ulang (reflow) di browser
+                tf.style.transition = 'width 10s linear'; // Waktu maksimal 10 detik
                 tf.style.width = '0%';
-                
-                // Auto fail after 10 seconds logic could go here, but prompt implies answering.
-                // We'll just use timer for visual urgency and bonus points.
             }
         }
 
+        /** Memeriksa Jawaban dan Memberi Feedback */
         function checkAnswer(p, selected, correct) {
-            if (!p.active) return;
-            p.active = false; // Prevent double clicking
+            if (gameEnded || !p.active) return;
+            p.active = false; // Kunci area pemain saat animasi berjalan
 
             const timeTaken = (Date.now() - p.qStartTime) / 1000;
             const isCorrect = selected === correct;
             const feedback = document.getElementById(`feedback-${p.id}`);
             const fbIcon = document.getElementById(`fb-icon-${p.id}`);
             const fbText = document.getElementById(`fb-text-${p.id}`);
+            
+            p.qIndex++; // Lanjut soal
 
+            // Feedback Visual dan Sistem Skor
             if (isCorrect) {
                 playCorrectSound();
+                createParticles(p.id); // Panggil partikel kecil
+                
                 let points = 10;
                 let bonus = 0;
-                if (gameMode === 'speed' && timeTaken < 4) {
-                    bonus = 5;
-                } else if (timeTaken < 3) {
-                    bonus = 3;
-                }
+                // Logika Bonus Waktu
+                if (gameMode === 'speed' && timeTaken < 3) bonus = 5;
+                else if (timeTaken < 3) bonus = 3;
+                
                 p.score += points + bonus;
                 p.correct++;
                 
+                feedback.className = 'feedback-overlay show correct';
                 fbIcon.innerText = '⭐';
                 fbIcon.style.color = '#eab308';
                 fbText.innerText = bonus > 0 ? `Cepat! +${points+bonus}` : `Benar! +${points}`;
                 fbText.style.color = 'var(--correct)';
                 
-                // Random praise
-                if(Math.random() > 0.5) speak(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
+                // Narasi Pujian (Random)
+                if(Math.random() > 0.4) speak(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
                 
             } else {
                 playWrongSound();
                 p.wrong++;
+                
+                feedback.className = 'feedback-overlay show wrong';
                 fbIcon.innerText = '❌';
                 fbIcon.style.color = 'var(--wrong)';
-                fbText.innerText = `Jawaban: ${correct}`;
+                fbText.innerText = `Jawaban: ${correct}`; // Beritahu jawaban benar
                 fbText.style.color = 'var(--wrong)';
                 
-                // Random encourage
-                if(Math.random() > 0.5) speak(ENCOURAGE[Math.floor(Math.random() * ENCOURAGE.length)]);
+                // Narasi Penyemangat (Random)
+                if(Math.random() > 0.4) speak(ENCOURAGE[Math.floor(Math.random() * ENCOURAGE.length)]);
             }
 
+            // Render Skor Terbaru
             document.getElementById(`score-${p.id}`).innerText = p.score;
             
-            // Stop timer visual
-            if (gameMode === 'speed') {
-                document.getElementById(`timer-${p.id}`).style.transition = 'none';
+            // =============================================================
+            // LOGIKA PENGHENTIAN PERMAINAN
+            // Berlaku instan begitu ada salah satu yang menjawab 10 soal
+            // =============================================================
+            if (p.qIndex >= TOTAL_QUESTIONS) {
+                gameEnded = true;
+                const otherP = (p.id === 'p1') ? p2 : p1;
+                otherP.active = false; // Kunci permanen pemain lawan
+                
+                // Hentikan sisa timer animasi jika ada
+                document.getElementById(`timer-p1`).style.transition = 'none';
+                document.getElementById(`timer-p2`).style.transition = 'none';
             }
 
-            // Show Feedback
-            feedback.classList.add('show');
-            
-            // Next Question
+            // Delay 1.5 detik untuk menunjukkan feedback sebelum lanjut
             setTimeout(() => {
-                feedback.classList.remove('show');
-                p.qIndex++;
-                p.active = true;
-                loadQuestion(p);
-            }, 2000); // 2 second feedback delay
+                feedback.classList.remove('show', 'correct', 'wrong');
+                
+                if (p.qIndex >= TOTAL_QUESTIONS) {
+                    endGame(); // Akhiri permainan secara utuh
+                } else if (gameEnded) {
+                    // Jika game diakhiri oleh pemain sebelah, diam saja di layar menunggu
+                    showPlayerWait(p);
+                } else {
+                    p.active = true;
+                    loadQuestion(p);
+                }
+            }, 1500); 
         }
 
+        /** Tampilan Standby saat menunggu lawan/game berakhir */
         function showPlayerWait(p) {
             document.getElementById(`eq-text-${p.id}`).innerText = "Selesai!";
-            document.getElementById(`visual-${p.id}`).innerHTML = "<div style='font-size:4rem'>⏳</div>";
-            document.getElementById(`answers-${p.id}`).innerHTML = "<p>Menunggu pemain lain...</p>";
-            document.getElementById(`prog-${p.id}`).style.width = "100%";
-            document.getElementById(`q-count-${p.id}`).innerText = `Selesai ${TOTAL_QUESTIONS}/${TOTAL_QUESTIONS}`;
+            document.getElementById(`visual-${p.id}`).innerHTML = "<div style='font-size:4rem'>🛑</div>";
+            document.getElementById(`answers-${p.id}`).innerHTML = "<p style='font-size:1.5rem; text-align:center; color: #64748b;'>Menunggu perhitungan hasil akhir...</p>";
         }
 
-        function checkGameEnd() {
-            if (p1.qIndex >= TOTAL_QUESTIONS && p2.qIndex >= TOTAL_QUESTIONS) {
-                setTimeout(showResults, 1000);
-            }
+        /** Eksekusi Akhir Permainan, kalkulasi dan panggil Hasil */
+        function endGame() {
+            if (finalScreenShown) return; // Mencegah pemanggilan ganda
+            finalScreenShown = true;
+            
+            // Matikan dan kosongkan antrean suara agar tidak menumpuk saat layar hasil muncul
+            speechQueue = [];
+            window.speechSynthesis.cancel();
+            
+            showPlayerWait(p1);
+            showPlayerWait(p2);
+            
+            // Jeda sebentar lalu tampilkan pop-up / halaman hasil
+            setTimeout(showResults, 1500);
         }
 
-        /* --- RESULTS --- */
+        /**
+         * =====================================================================
+         * LAYAR HASIL AKHIR (RESULT SCREEN)
+         * =====================================================================
+         */
         function showResults() {
             nav('result');
-            playWinSound();
-            fireConfetti();
+            playWinSound(); // Suara melodi piala
+            startCanvasConfetti(); // Ledakkan Confetti
 
             const title = document.getElementById('result-title');
             const sub = document.getElementById('result-subtitle');
+            const winnerDisplay = document.getElementById('winner-display');
+            const cardP1 = document.getElementById('stat-card-p1');
+            const cardP2 = document.getElementById('stat-card-p2');
+            
+            // Bersihkan highlight lama
+            cardP1.classList.remove('winner-highlight');
+            cardP2.classList.remove('winner-highlight');
 
+            // Logika Penentuan Pemenang
             if (p1.score > p2.score) {
-                title.innerText = `${p1.name} MENANG!`;
-                title.style.color = 'var(--p1-color)';
-                speak(`Selamat! ${p1.name} memenangkan duel kali ini! ${p2.name} juga hebat, tetap semangat!`);
+                winnerDisplay.innerHTML = `🏆 <span style="font-size:4rem">${p1.avatar}</span>`;
+                title.innerText = "JUARA 1 – PEMENANG!";
+                title.style.color = 'var(--p1-main)';
+                sub.innerText = `Selamat! ${p1.name} memenangkan duel kali ini.`;
+                cardP1.classList.add('winner-highlight');
+                speak(`Luar biasa! Selamat kepada ${p1.name} yang berhasil menjadi juara! Dan tetap semangat untuk ${p2.name}, kamu sudah bermain dengan hebat. Ayo coba lagi!`);
+                playApplause();
             } else if (p2.score > p1.score) {
-                title.innerText = `${p2.name} MENANG!`;
-                title.style.color = 'var(--p2-color)';
-                speak(`Selamat! ${p2.name} memenangkan duel kali ini! ${p1.name} juga hebat, tetap semangat!`);
+                winnerDisplay.innerHTML = `<span style="font-size:4rem">${p2.avatar}</span> 🏆`;
+                title.innerText = "JUARA 1 – PEMENANG!";
+                title.style.color = 'var(--p2-main)';
+                sub.innerText = `Selamat! ${p2.name} memenangkan duel kali ini.`;
+                cardP2.classList.add('winner-highlight');
+                speak(`Luar biasa! Selamat kepada ${p2.name} yang berhasil menjadi juara! Dan tetap semangat untuk ${p1.name}, kamu sudah bermain dengan hebat. Ayo coba lagi!`);
+                playApplause();
             } else {
-                title.innerText = "SERI!";
-                title.style.color = '#f59e0b';
-                speak("Wah, hasilnya seri! Kalian berdua sama-sama pintar!");
+                // Logika Hasil Seri
+                winnerDisplay.innerHTML = `🏆 <span style="font-size:4rem">${p1.avatar} ${p2.avatar}</span> 🏆`;
+                title.innerText = "HASIL SERI! KALIAN HEBAT!";
+                title.style.color = 'var(--gold)';
+                sub.innerText = "Pertarungan sengit! Skor kalian sama kuat.";
+                cardP1.classList.add('winner-highlight');
+                cardP2.classList.add('winner-highlight');
+                speak("Wah! Pertarungan yang sangat sengit! Hasilnya adalah seri. Kalian berdua sungguh juara yang hebat!");
+                playApplause();
             }
 
-            // Populate Stats P1
+            // Isi Rincian Statistik P1
             document.getElementById('res-av-p1').innerText = p1.avatar;
             document.getElementById('res-name-p1').innerText = p1.name;
             document.getElementById('res-score-p1').innerText = p1.score;
             document.getElementById('res-cor-p1').innerText = p1.correct;
             document.getElementById('res-wro-p1').innerText = p1.wrong;
+            document.getElementById('res-un-p1').innerText = TOTAL_QUESTIONS - p1.qIndex;
 
-            // Populate Stats P2
+            // Isi Rincian Statistik P2
             document.getElementById('res-av-p2').innerText = p2.avatar;
             document.getElementById('res-name-p2').innerText = p2.name;
             document.getElementById('res-score-p2').innerText = p2.score;
             document.getElementById('res-cor-p2').innerText = p2.correct;
             document.getElementById('res-wro-p2').innerText = p2.wrong;
+            document.getElementById('res-un-p2').innerText = TOTAL_QUESTIONS - p2.qIndex;
         }
 
-        /* --- CONFETTI EFFECT (VANILLA JS) --- */
-        let confettiCtx, confettiParticles = [];
-        function fireConfetti() {
-            const canvas = document.getElementById('confetti');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            confettiCtx = canvas.getContext('2d');
-            confettiParticles = [];
-            
-            const colors = ['#fce18a', '#ff726d', '#b48def', '#f4306d'];
-            for (let i = 0; i < 150; i++) {
-                confettiParticles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    w: Math.random() * 10 + 5,
-                    h: Math.random() * 10 + 5,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    vy: Math.random() * 3 + 2,
-                    vx: Math.random() * 4 - 2,
-                    rot: Math.random() * 360,
-                    rs: Math.random() * 5 - 2.5
-                });
-            }
-            requestAnimationFrame(renderConfetti);
-        }
-
-        function renderConfetti() {
-            if (!confettiCtx) return;
-            confettiCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-            let active = false;
-            confettiParticles.forEach(p => {
-                p.y += p.vy;
-                p.x += p.vx;
-                p.rot += p.rs;
-                if (p.y < window.innerHeight) active = true;
-                
-                confettiCtx.save();
-                confettiCtx.translate(p.x + p.w/2, p.y + p.h/2);
-                confettiCtx.rotate(p.rot * Math.PI / 180);
-                confettiCtx.fillStyle = p.color;
-                confettiCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-                confettiCtx.restore();
-            });
-            if (active) requestAnimationFrame(renderConfetti);
-        }
+        /**
+         * =====================================================================
+         * SISTEM PARTIKEL EFEK (CONFETTI & BINTANG) - VANILLA JS PURE
+         * =====================================================================
+         */
         
-        // Handle window resize for confetti
+        let fxCtx, fxParticles = [];
+        let animationFrameId;
+
+        // Inisialisasi Canvas
+        const fxCanvas = document.getElementById('fx-canvas');
+        if (fxCanvas) {
+            fxCanvas.width = window.innerWidth;
+            fxCanvas.height = window.innerHeight;
+            fxCtx = fxCanvas.getContext('2d');
+        }
+
+        // Handle Resize agar kanvas selalu proporsional
         window.addEventListener('resize', () => {
-            const canvas = document.getElementById('confetti');
-            if(canvas) {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+            if (fxCanvas) {
+                fxCanvas.width = window.innerWidth;
+                fxCanvas.height = window.innerHeight;
             }
         });
 
+        /** Partikel kecil untuk Jawaban Benar di Papan */
+        function createParticles(playerId) {
+            if (!fxCtx) return;
+            const board = document.getElementById(`board-${playerId}`);
+            const rect = board.getBoundingClientRect();
+            // Tengah area board pemain
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 20; i++) {
+                fxParticles.push({
+                    type: 'star',
+                    x: cx, y: cy,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15,
+                    life: 1.0,
+                    color: '#eab308',
+                    size: Math.random() * 15 + 5
+                });
+            }
+            if (!animationFrameId) renderParticles();
+        }
+
+        /** Ledakan Besar Confetti untuk Pemenang */
+        function startCanvasConfetti() {
+            if (!fxCtx) return;
+            const colors = ['#fce18a', '#ff726d', '#b48def', '#f4306d', '#22c55e', '#3b82f6'];
+            
+            for (let i = 0; i < 200; i++) {
+                fxParticles.push({
+                    type: 'confetti',
+                    x: Math.random() * fxCanvas.width,
+                    y: Math.random() * -fxCanvas.height, // Mulai dari atas luar layar
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: Math.random() * 5 + 3,
+                    w: Math.random() * 10 + 5,
+                    h: Math.random() * 15 + 5,
+                    rot: Math.random() * 360,
+                    rs: (Math.random() - 0.5) * 10,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 10 // Nyawa panjang karena jatuh dari atas
+                });
+            }
+            if (!animationFrameId) renderParticles();
+        }
+
+        /** Loop Render Partikel (60 FPS) */
+        function renderParticles() {
+            if (!fxCtx) return;
+            fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+            let active = false;
+            
+            for (let i = fxParticles.length - 1; i >= 0; i--) {
+                let p = fxParticles[i];
+                
+                if (p.type === 'confetti') {
+                    p.y += p.vy;
+                    p.x += p.vx;
+                    p.rot += p.rs;
+                    if (p.y < fxCanvas.height) active = true;
+                    
+                    fxCtx.save();
+                    fxCtx.translate(p.x, p.y);
+                    fxCtx.rotate(p.rot * Math.PI / 180);
+                    fxCtx.fillStyle = p.color;
+                    fxCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+                    fxCtx.restore();
+                    
+                } else if (p.type === 'star') {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.02;
+                    if (p.life > 0) active = true;
+                    
+                    fxCtx.save();
+                    fxCtx.globalAlpha = Math.max(0, p.life);
+                    fxCtx.translate(p.x, p.y);
+                    fxCtx.fillStyle = p.color;
+                    fxCtx.font = `${p.size}px Arial`;
+                    fxCtx.fillText('⭐', 0, 0);
+                    fxCtx.restore();
+                }
+
+                // Hapus memori array jika partikel habis
+                if (p.y > fxCanvas.height || (p.type === 'star' && p.life <= 0)) {
+                    fxParticles.splice(i, 1);
+                }
+            }
+
+            if (active) {
+                animationFrameId = requestAnimationFrame(renderParticles);
+            } else {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        }
     </script>
 </body>
 </html>
