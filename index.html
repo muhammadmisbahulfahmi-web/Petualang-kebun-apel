@@ -3,393 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Petualangan Kebun Apel - Matematika Kelas 1 & 2</title>
+    <title>Petualangan Koki Cilik: Belajar Menghitung!</title>
+    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts untuk tampilan ramah anak -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
-        
         body {
-            font-family: 'Fredoka', sans-serif;
-            background-color: #f0f9ff;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            /* Pattern background ceria */
+            background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
+            background-size: 30px 30px;
             user-select: none;
+            -webkit-user-select: none;
         }
-
-        /* Animations */
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
-        @keyframes bounceIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-
-        .shake { animation: shake 0.5s; }
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
+        /* Animasi Custom */
+        @keyframes bounce-short {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .animate-bounce-short {
+            animation: bounce-short 0.4s ease-in-out;
         }
 
-        .apple-item {
-            display: inline-block;
-            font-size: 2rem;
-            margin: 2px;
-            cursor: pointer;
-            transition: transform 0.2s;
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
         }
-        .apple-item:active { transform: scale(0.8); }
+        .animate-wiggle {
+            animation: wiggle 0.5s ease-in-out infinite;
+        }
 
-        /* Custom Scrollbar hide for mobile */
-        ::-webkit-scrollbar { display: none; }
+        /* Menyembunyikan elemen secara default untuk transisi JS */
+        .screen { display: none; }
+        .screen.active { display: flex; flex-direction: column; animation: fadeIn 0.5s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Tombol bergaya game 3D */
+        .btn-game {
+            transition: all 0.1s;
+            box-shadow: 0 6px 0px rgba(0,0,0,0.2);
+        }
+        .btn-game:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0px rgba(0,0,0,0.2);
+        }
+
+        /* Modal Overlay */
+        #modal-overlay {
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4 text-slate-800">
+<body class="h-screen w-screen flex items-center justify-center p-4 overflow-hidden">
 
-    <!-- Main App Container -->
-    <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden relative border-8 border-sky-200 min-h-[600px] flex flex-col">
+    <!-- Kontainer Utama Aplikasi -->
+    <div class="relative w-full max-w-lg h-[90vh] sm:h-[800px] bg-white rounded-[40px] shadow-2xl overflow-hidden border-8 border-yellow-300 flex flex-col">
         
         <!-- HEADER -->
-        <div class="bg-sky-400 p-4 text-center rounded-b-3xl shadow-sm z-10">
-            <h1 class="text-white text-2xl font-bold tracking-wide">🍎 Kebun Paman Budi</h1>
+        <div class="bg-yellow-400 text-yellow-900 text-center py-4 font-black text-xl rounded-t-3xl shadow-md z-10 flex justify-between px-6 items-center">
+            <span>👨‍🍳 Koki Cilik</span>
+            <span id="progress-text" class="text-sm bg-white/50 px-3 py-1 rounded-full shadow-inner">Mulai</span>
         </div>
 
-        <!-- CONTENT AREA -->
-        <div id="content-area" class="flex-1 p-6 relative overflow-y-auto">
-            
-            <!-- SCREEN 1: APERSEPSI -->
-            <div id="screen-home" class="fade-in flex flex-col items-center justify-center h-full text-center space-y-6 mt-8">
-                <div class="text-8xl bounce-in">👨‍🌾</div>
-                <h2 class="text-3xl font-bold text-sky-600">Halo, Teman-teman!</h2>
-                <p class="text-lg text-slate-600">Paman Budi sedang panen besar hari ini. Tapi paman kesulitan menghitung apel-apel ini.</p>
-                <p class="text-xl font-semibold text-amber-500">Maukah kamu membantu Paman?</p>
-                <button onclick="nav('screen-add')" class="mt-4 bg-amber-400 hover:bg-amber-500 text-white text-xl font-bold py-4 px-8 rounded-full shadow-[0_6px_0_#d97706] active:shadow-[0_0px_0_#d97706] active:translate-y-[6px] transition-all w-full">
-                    Ayo Bantu Paman! 🚀
+        <!-- MAIN CONTENT AREA -->
+        <div class="flex-1 relative overflow-y-auto overflow-x-hidden p-6 bg-blue-50/50 flex flex-col justify-center">
+
+            <!-- SCREEN 0: APERSEPSI (Intro) -->
+            <div id="screen-0" class="screen active text-center items-center justify-center h-full">
+                <div class="text-8xl mb-4 animate-wiggle">🧑‍🍳</div>
+                <h1 class="text-3xl font-black text-blue-600 mb-4">Halo Teman-teman!</h1>
+                <p class="text-lg text-gray-700 mb-8 font-bold leading-relaxed">
+                    Selamat datang di Dapur Koki Kiki!<br>
+                    Hari ini kita akan belajar menghitung bahan makanan lezat.<br>
+                    Sudah siap berpetualang dan menjadi pintar?
+                </p>
+                <button onclick="nextScreen(1); playSound('click')" class="btn-game bg-green-500 hover:bg-green-400 text-white font-black text-2xl py-4 px-10 rounded-full w-full max-w-xs border-4 border-green-700">
+                    MULAI! 🚀
                 </button>
             </div>
 
-            <!-- SCREEN 2: MATERI PENJUMLAHAN -->
-            <div id="screen-add" class="hidden fade-in flex-col h-full space-y-4">
-                <div class="bg-amber-100 p-4 rounded-2xl border-2 border-amber-300 text-center">
-                    <h3 class="font-bold text-amber-700 text-xl">1. Belajar Menjumlahkan</h3>
-                    <p class="text-sm text-amber-800 leading-tight mt-1">Gabungkan apel merah dan hijau ke dalam keranjang (Maks 20).</p>
-                </div>
-
-                <!-- Interactive Counters -->
-                <div class="flex justify-between items-center bg-red-50 p-3 rounded-2xl border-2 border-red-200">
-                    <button onclick="updateAdd('red', -1)" class="w-10 h-10 bg-red-400 text-white rounded-full text-2xl font-bold shadow-md active:scale-90">-</button>
-                    <div class="text-center"><span class="text-3xl">🍎</span> <span id="count-red" class="text-2xl font-bold">0</span></div>
-                    <button onclick="updateAdd('red', 1)" class="w-10 h-10 bg-red-400 text-white rounded-full text-2xl font-bold shadow-md active:scale-90">+</button>
-                </div>
+            <!-- SCREEN 1: MATERI 1 (Penjumlahan) -->
+            <div id="screen-1" class="screen text-center h-full">
+                <h2 class="text-2xl font-black text-pink-600 mb-2">Penjumlahan (+)</h2>
+                <p class="text-gray-600 font-bold mb-4">Kiki membuat <span class="text-pink-600 text-xl">8</span> Donat, lalu membuat <span class="text-pink-600 text-xl">4</span> Donat lagi. Berapa totalnya?</p>
                 
-                <div class="flex justify-between items-center bg-green-50 p-3 rounded-2xl border-2 border-green-200">
-                    <button onclick="updateAdd('green', -1)" class="w-10 h-10 bg-green-400 text-white rounded-full text-2xl font-bold shadow-md active:scale-90">-</button>
-                    <div class="text-center"><span class="text-3xl">🍏</span> <span id="count-green" class="text-2xl font-bold">0</span></div>
-                    <button onclick="updateAdd('green', 1)" class="w-10 h-10 bg-green-400 text-white rounded-full text-2xl font-bold shadow-md active:scale-90">+</button>
-                </div>
-
-                <!-- Visual Result -->
-                <div class="bg-sky-50 flex-1 rounded-2xl border-2 border-sky-200 p-4 flex flex-col items-center">
-                    <div class="text-2xl font-bold text-sky-700 mb-2">Total Apel: <span id="total-add" class="text-4xl text-sky-500">0</span></div>
-                    <div id="visual-add" class="text-center min-h-[100px] flex flex-wrap justify-center items-center content-start">
-                        <!-- Apples injected here -->
+                <div class="bg-white p-4 rounded-2xl shadow-inner border-2 border-gray-100 mb-6 flex flex-col gap-4">
+                    <div class="flex items-center justify-center gap-2 flex-wrap">
+                        <span class="text-3xl text-gray-400 font-black">8</span>
+                        <div class="flex flex-wrap justify-center gap-1">
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                        </div>
+                    </div>
+                    <div class="text-4xl font-black text-gray-300">+</div>
+                    <div class="flex items-center justify-center gap-2 flex-wrap">
+                        <span class="text-3xl text-gray-400 font-black">4</span>
+                        <div class="flex flex-wrap justify-center gap-1">
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                            <span class="text-4xl cursor-pointer hover:scale-110 transition-transform" onclick="animateItem(this)">🍩</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex justify-between mt-auto pt-2">
-                    <button onclick="nav('screen-home')" class="bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-2xl active:scale-95 transition-transform">Kembali</button>
-                    <button onclick="nav('screen-sub')" class="bg-sky-400 text-white font-bold py-3 px-6 rounded-2xl shadow-[0_4px_0_#0284c7] active:shadow-none active:translate-y-[4px] transition-all">Selanjutnya ➡️</button>
+                <div class="mt-auto">
+                    <p class="text-lg font-bold text-gray-700 mb-4 bg-yellow-100 p-3 rounded-xl">Coba klik donatnya untuk menghitung satu per satu!</p>
+                    <div class="flex justify-between gap-4">
+                        <button onclick="nextScreen(0); playSound('click')" class="btn-game bg-gray-400 text-white font-bold py-3 px-6 rounded-2xl w-1/3">Kembali</button>
+                        <button onclick="nextScreen(2); playSound('click')" class="btn-game bg-blue-500 text-white font-black py-3 px-6 rounded-2xl w-2/3">Lanjut ➡️</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- SCREEN 3: MATERI PENGURANGAN -->
-            <div id="screen-sub" class="hidden fade-in flex-col h-full space-y-4">
-                <div class="bg-purple-100 p-4 rounded-2xl border-2 border-purple-300 text-center">
-                    <h3 class="font-bold text-purple-700 text-xl">2. Belajar Mengurangkan</h3>
-                    <p class="text-sm text-purple-800 leading-tight mt-1">Paman punya 20 apel. Klik apel untuk memakannya!</p>
-                </div>
-
-                <div class="text-center bg-white p-2 rounded-xl shadow-sm border border-slate-100">
-                    <p class="text-xl font-bold text-slate-600">Sisa Apel Paman:</p>
-                    <p class="text-5xl font-bold text-purple-500 my-1" id="total-sub">20</p>
-                </div>
-
-                <!-- Visual Subtraction Area -->
-                <div class="bg-purple-50 flex-1 rounded-2xl border-2 border-purple-200 p-4 flex flex-col items-center justify-center">
-                    <div id="visual-sub" class="text-center flex flex-wrap justify-center items-center gap-1">
-                        <!-- 20 Apples injected here -->
-                    </div>
-                    <button onclick="resetSub()" class="mt-6 text-purple-600 font-bold underline text-sm">Penuhi lagi keranjangnya 🔄</button>
-                </div>
-
-                <div class="flex justify-between mt-auto pt-2">
-                    <button onclick="nav('screen-add')" class="bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-2xl active:scale-95 transition-transform">Kembali</button>
-                    <button onclick="nav('screen-quiz')" class="bg-emerald-400 text-white font-bold py-3 px-6 rounded-2xl shadow-[0_4px_0_#059669] active:shadow-none active:translate-y-[4px] transition-all">Mulai Kuis! 📝</button>
-                </div>
-            </div>
-
-            <!-- SCREEN 4: KUIS FORMATIF -->
-            <div id="screen-quiz" class="hidden fade-in flex-col h-full">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold text-sm">Soal <span id="quiz-num">1</span>/3</span>
-                    <span class="text-xl">⭐️ <span id="quiz-score" class="font-bold">0</span></span>
-                </div>
-
-                <div class="bg-white border-2 border-slate-200 rounded-3xl p-5 shadow-sm flex-1 flex flex-col justify-center items-center text-center relative">
-                    
-                    <!-- Tombol Speaker -->
-                    <button onclick="bacakanSoal()" class="absolute top-4 right-4 bg-amber-100 hover:bg-amber-200 text-amber-600 p-3 rounded-full shadow-sm active:scale-90 transition-all text-xl" title="Bacakan Soal">
-                        🔊
-                    </button>
-
-                    <p id="quiz-question" class="text-xl font-bold text-slate-700 mb-4 mt-8 h-20 flex items-center justify-center">Pertanyaan disini</p>
-                    
-                    <div id="quiz-visual" class="mb-8 min-h-[80px] flex flex-wrap justify-center items-center text-3xl">
-                        <!-- Quiz Visuals -->
-                    </div>
-
-                    <div id="quiz-options" class="grid grid-cols-2 gap-4 w-full">
-                        <!-- Options injected here -->
-                    </div>
-                </div>
-
-                <!-- NEW: Tombol Kembali agar anak tidak terjebak di dalam Kuis -->
-                <div class="mt-4 flex justify-start">
-                    <button onclick="nav('screen-sub')" class="bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-3 px-6 rounded-2xl active:scale-95 transition-all w-full md:w-auto shadow-sm">⬅️ Kembali ke Materi</button>
-                </div>
-            </div>
-
-            <!-- SCREEN 5: PENUTUP & TANTANGAN -->
-            <div id="screen-end" class="hidden fade-in flex-col items-center justify-center h-full text-center space-y-6 mt-4">
-                <div class="text-8xl bounce-in">🏆</div>
-                <h2 class="text-3xl font-bold text-amber-500">Luar Biasa!</h2>
-                <p class="text-lg text-slate-600">Kamu sudah membantu Paman Budi dan sekarang kamu adalah <b>Juara Berhitung!</b></p>
+            <!-- SCREEN 2: MATERI 2 (Pengurangan) -->
+            <div id="screen-2" class="screen text-center h-full">
+                <h2 class="text-2xl font-black text-purple-600 mb-2">Pengurangan (-)</h2>
+                <p class="text-gray-600 font-bold mb-4">Ada <span class="text-purple-600 text-xl">10</span> Apel di keranjang. <span class="text-purple-600 text-xl">3</span> Apel dimakan. Sisa berapa?</p>
                 
-                <div class="bg-sky-100 p-5 rounded-3xl border-2 border-sky-300 w-full relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 text-5xl opacity-20">🔎</div>
-                    <h3 class="font-bold text-sky-700 text-lg mb-2">Tantangan Rahasia Paman:</h3>
-                    <p class="text-sky-900 text-sm font-medium">Coba pergi ke dapurmu. Hitunglah ada berapa jumlah <b>sendok</b> dan <b>garpu</b>. Apakah jumlah semuanya lebih dari 20?</p>
+                <div class="bg-white p-4 rounded-2xl shadow-inner border-2 border-gray-100 mb-6 relative min-h-[150px]">
+                    <p class="text-sm text-gray-400 mb-2 italic">Klik apel untuk memakannya!</p>
+                    <div id="apple-container" class="flex flex-wrap justify-center gap-2">
+                        <!-- Apples will be generated via JS to allow clicking -->
+                    </div>
                 </div>
 
-                <button onclick="resetApp()" class="mt-4 bg-sky-400 hover:bg-sky-500 text-white text-xl font-bold py-4 px-8 rounded-full shadow-[0_6px_0_#0284c7] active:shadow-none active:translate-y-[6px] transition-all w-full">
-                    Main Lagi! 🔄
+                <div class="mt-auto">
+                    <button onclick="resetApples(); playSound('click')" class="text-sm font-bold text-blue-500 underline mb-4">Ulangi Apel</button>
+                    <div class="flex justify-between gap-4">
+                        <button onclick="nextScreen(1); playSound('click')" class="btn-game bg-gray-400 text-white font-bold py-3 px-6 rounded-2xl w-1/3">Kembali</button>
+                        <button onclick="nextScreen(3); playSound('click')" class="btn-game bg-blue-500 text-white font-black py-3 px-6 rounded-2xl w-2/3">Mulai Kuis 🎯</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCREEN 3: KUIS 1 -->
+            <div id="screen-3" class="screen text-center h-full">
+                <div class="mb-4"><span class="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm">Soal 1 dari 3</span></div>
+                <h2 class="text-xl font-black text-gray-800 mb-4 leading-snug">
+                    Berapakah hasil dari:<br>
+                    <span class="text-3xl text-pink-500">7 🧁 + 5 🧁 = ?</span>
+                </h2>
+                <div class="bg-pink-50 rounded-xl p-4 mb-6 flex flex-wrap justify-center gap-1 text-2xl">
+                    🧁🧁🧁🧁🧁🧁🧁 <span class="font-black text-gray-400 mx-2">+</span> 🧁🧁🧁🧁🧁
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-auto">
+                    <button onclick="checkAnswer(1, 10, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">10</button>
+                    <button onclick="checkAnswer(1, 11, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">11</button>
+                    <button onclick="checkAnswer(1, 12, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">12</button>
+                    <button onclick="checkAnswer(1, 13, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">13</button>
+                </div>
+            </div>
+
+            <!-- SCREEN 4: KUIS 2 -->
+            <div id="screen-4" class="screen text-center h-full">
+                <div class="mb-4"><span class="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm">Soal 2 dari 3</span></div>
+                <h2 class="text-xl font-black text-gray-800 mb-4 leading-snug">
+                    Berapakah hasil dari:<br>
+                    <span class="text-3xl text-purple-500">15 🍬 - 6 🍬 = ?</span>
+                </h2>
+                <div class="bg-purple-50 rounded-xl p-4 mb-6 text-xl">
+                    Hitung mundur atau hilangkan 6 permen dari 15 permen!
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-auto">
+                    <button onclick="checkAnswer(2, 7, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">7</button>
+                    <button onclick="checkAnswer(2, 8, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">8</button>
+                    <button onclick="checkAnswer(2, 9, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">9</button>
+                    <button onclick="checkAnswer(2, 10, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">10</button>
+                </div>
+            </div>
+
+            <!-- SCREEN 5: KUIS 3 (Cerita) -->
+            <div id="screen-5" class="screen text-center h-full">
+                <div class="mb-4"><span class="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm">Soal 3 dari 3</span></div>
+                <h2 class="text-xl font-black text-gray-800 mb-4 leading-snug">
+                    Soal Cerita:
+                </h2>
+                <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 mb-6 text-left">
+                    <p class="font-bold text-gray-700 text-lg">
+                        Kiki memanggang <span class="text-green-600 font-black text-xl">11 🍪</span> kue coklat dan <span class="text-green-600 font-black text-xl">8 🍪</span> kue keju.
+                    </p>
+                    <p class="font-bold text-gray-700 mt-2">
+                        Berapa jumlah semua kue yang dipanggang Kiki?
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-auto">
+                    <button onclick="checkAnswer(3, 17, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">17</button>
+                    <button onclick="checkAnswer(3, 18, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">18</button>
+                    <button onclick="checkAnswer(3, 19, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">19</button>
+                    <button onclick="checkAnswer(3, 20, this)" class="btn-game bg-white border-4 border-gray-200 text-2xl font-black text-gray-700 py-4 rounded-2xl hover:bg-gray-50">20</button>
+                </div>
+            </div>
+
+            <!-- SCREEN 6: PENUTUP & TANTANGAN -->
+            <div id="screen-6" class="screen text-center items-center justify-center h-full">
+                <div class="text-8xl mb-4 animate-bounce-short">🏆</div>
+                <h1 class="text-4xl font-black text-yellow-500 mb-2">Luar Biasa!</h1>
+                <p class="text-lg text-gray-700 font-bold mb-6">Kamu telah berhasil membantu Koki Kiki. Kamu sangat pintar menghitung!</p>
+                
+                <div class="bg-blue-100 border-4 border-blue-300 p-5 rounded-3xl w-full mb-6 relative">
+                    <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white font-bold px-4 py-1 rounded-full text-sm">
+                        Misi Rahasia 🕵️‍♂️
+                    </div>
+                    <p class="font-bold text-blue-900 mt-2">Tantangan di Rumah:</p>
+                    <p class="text-blue-800 text-sm mt-1 leading-snug">
+                        Coba cari <strong>10 sendok</strong> 🥄 dan <strong>5 garpu</strong> 🍴 di dapurmu. Gabungkan dan hitung semuanya! Tulis hasilnya di buku tulismu ya.
+                    </p>
+                </div>
+
+                <button onclick="resetApp(); playSound('click')" class="btn-game bg-purple-500 hover:bg-purple-400 text-white font-black text-xl py-3 px-8 rounded-full w-full max-w-xs border-4 border-purple-700">
+                    Main Lagi 🔄
                 </button>
             </div>
 
         </div>
+
+        <!-- MODAL FEEDBACK (Hidden by default) -->
+        <div id="modal-overlay" class="absolute inset-0 z-50 hidden flex-col items-center justify-center p-6">
+            <div id="modal-content" class="bg-white rounded-3xl p-8 text-center shadow-2xl transform scale-90 transition-transform duration-300 w-full max-w-sm border-8">
+                <div id="modal-icon" class="text-7xl mb-4">⭐</div>
+                <h2 id="modal-title" class="text-3xl font-black mb-2">Hebat!</h2>
+                <p id="modal-msg" class="text-lg text-gray-600 font-bold mb-6">Jawabanmu benar.</p>
+                <button id="modal-btn" class="btn-game text-white font-black text-xl py-3 px-8 rounded-full w-full">
+                    Lanjut
+                </button>
+            </div>
+        </div>
+
     </div>
 
-    <!-- AUDIO EFFECTS (Synthesized/Visual due to constraints, represented by emojis/animations) -->
-
     <script>
-        // --- Sistem Audio (Web Audio API & Speech Synthesis) ---
+        /* --- AUDIO SYSTEM (Web Audio API) --- */
+        // Menggunakan Web Audio API agar tidak perlu file mp3 eksternal (standalone)
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTone(frequency, type, duration, vol=0.5) {
+            if (!audioCtx) return;
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            
+            gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
 
         function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            if (type === 'pop') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.1);
-            } else if (type === 'correct') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
-            } else if (type === 'wrong') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
-            } else if (type === 'click') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.1);
+            initAudio();
+            switch(type) {
+                case 'click':
+                    // Suara 'pop' pendek
+                    playTone(600, 'sine', 0.1, 0.3);
+                    break;
+                case 'pop':
+                    // Suara interaksi objek
+                    playTone(800, 'sine', 0.05, 0.2);
+                    break;
+                case 'correct':
+                    // Chord ceria
+                    playTone(523.25, 'sine', 0.15, 0.5); // C5
+                    setTimeout(() => playTone(659.25, 'sine', 0.15, 0.5), 100); // E5
+                    setTimeout(() => playTone(783.99, 'sine', 0.3, 0.5), 200); // G5
+                    break;
+                case 'wrong':
+                    // Suara 'boop' rendah
+                    playTone(200, 'sawtooth', 0.3, 0.4);
+                    setTimeout(() => playTone(150, 'sawtooth', 0.4, 0.4), 150);
+                    break;
+                case 'win':
+                    // Arpeggio kemenangan
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, i) => {
+                        setTimeout(() => playTone(freq, 'sine', 0.2, 0.5), i * 150);
+                    });
+                    break;
             }
         }
 
-        function bacakanSoal() {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Hentikan suara yang sedang berjalan
-                const teksSoal = document.getElementById('quiz-question').innerText;
-                const utterance = new SpeechSynthesisUtterance(teksSoal);
-                utterance.lang = 'id-ID'; // Bahasa Indonesia
-                utterance.rate = 0.85; // Sedikit diperlambat agar mudah dipahami anak-anak
-                utterance.pitch = 1.2; // Sedikit ditinggikan agar lebih ceria
-                window.speechSynthesis.speak(utterance);
-            } else {
-                alert("Maaf, browser kamu tidak mendukung fitur suara.");
-            }
-        }
-
-        // --- Navigation Logic ---
-        const screens = ['screen-home', 'screen-add', 'screen-sub', 'screen-quiz', 'screen-end'];
+        /* --- STATE MANAGEMENT --- */
+        let currentScreen = 0;
+        const totalScreens = 6;
         
-        function nav(targetId) {
-            playSound('click'); // Tambahkan efek suara klik untuk navigasi
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel(); // Hentikan narator jika pindah halaman
+        const correctAnswers = {
+            1: 12,
+            2: 9,
+            3: 19
+        };
 
-            screens.forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-                document.getElementById(id).classList.remove('flex');
-            });
-            const target = document.getElementById(targetId);
-            target.classList.remove('hidden');
-            target.classList.add('flex');
-
-            // Specific triggers on enter
-            if(targetId === 'screen-sub') resetSub();
-            if(targetId === 'screen-quiz') startQuiz();
-        }
-
-        // --- Logic: Penjumlahan (Addition) ---
-        let countRed = 0;
-        let countGreen = 0;
-        const maxTotal = 20;
-
-        function updateAdd(color, change) {
-            let total = countRed + countGreen;
-            let success = false;
+        /* --- UI LOGIC --- */
+        function nextScreen(screenIndex) {
+            // Sembunyikan semua layar
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             
-            if (color === 'red') {
-                if (countRed + change >= 0 && total + change <= maxTotal) {
-                    countRed += change;
-                    success = true;
-                }
-            } else {
-                if (countGreen + change >= 0 && total + change <= maxTotal) {
-                    countGreen += change;
-                    success = true;
-                }
-            }
+            // Tampilkan layar target
+            document.getElementById(`screen-${screenIndex}`).classList.add('active');
+            currentScreen = screenIndex;
 
-            document.getElementById('count-red').innerText = countRed;
-            document.getElementById('count-green').innerText = countGreen;
-            document.getElementById('total-add').innerText = countRed + countGreen;
+            // Update Header Teks
+            const progressText = document.getElementById('progress-text');
+            if (screenIndex === 0) progressText.innerText = "Mulai";
+            else if (screenIndex === 1 || screenIndex === 2) progressText.innerText = "Belajar";
+            else if (screenIndex >= 3 && screenIndex <= 5) progressText.innerText = `Kuis ${screenIndex - 2}/3`;
+            else progressText.innerText = "Selesai!";
 
-            // Mainkan suara pop jika berhasil, atau tet-tot jika mencapai limit/batas (kurang dari 0 atau lebih dari 20)
-            if (success) {
-                if (change !== 0) playSound('pop');
-                renderAddVisuals();
-            } else if (change !== 0) {
-                playSound('wrong'); 
-            }
-        }
-
-        function renderAddVisuals() {
-            const container = document.getElementById('visual-add');
-            container.innerHTML = '';
-            
-            let html = '';
-            for(let i=0; i<countRed; i++) html += `<span class="apple-item bounce-in">🍎</span>`;
-            for(let i=0; i<countGreen; i++) html += `<span class="apple-item bounce-in">🍏</span>`;
-            
-            if(countRed === 0 && countGreen === 0) {
-                html = '<span class="text-slate-300 text-sm">Keranjang masih kosong</span>';
-            }
-            container.innerHTML = html;
-        }
-
-        // --- Logic: Pengurangan (Subtraction) ---
-        let subTotal = 20;
-        
-        function resetSub() {
-            playSound('click');
-            subTotal = 20;
-            updateSubUI();
-        }
-
-        function eatApple(element) {
-            if (subTotal > 0) {
-                playSound('pop'); // Mainkan suara saat apel diklik
-
-                // Change visual to eaten core or disappear
-                element.innerHTML = '✨';
-                element.style.pointerEvents = 'none';
-                element.classList.add('fade-in');
-                
-                setTimeout(() => {
-                    element.style.opacity = '0';
-                    element.style.width = '0px';
-                    element.style.margin = '0px';
-                }, 300);
-
-                subTotal--;
-                document.getElementById('total-sub').innerText = subTotal;
-            }
-        }
-
-        function updateSubUI() {
-            document.getElementById('total-sub').innerText = subTotal;
-            const container = document.getElementById('visual-sub');
-            container.innerHTML = '';
-            for(let i=0; i<20; i++) {
-                container.innerHTML += `<span class="apple-item bounce-in" onclick="eatApple(this)">🍎</span>`;
-            }
-        }
-
-        // --- Logic: Kuis Formatif (Quiz) ---
-        const quizData = [
-            { 
-                q: "Paman Budi punya 7 apel merah. Lalu ia memetik 5 apel hijau. Berapa jumlah apel Paman sekarang?",
-                v: "🍎🍎🍎🍎🍎🍎🍎 <br>+<br> 🍏🍏🍏🍏🍏",
-                options: [10, 11, 12, 13], 
-                answer: 12 
-            },
-            { 
-                q: "Di keranjang ada 15 apel. Dimakan ulat 6 apel. Sisa berapa apel yang utuh?",
-                v: "🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎 <br> <i>- 6 dimakan ulat</i>",
-                options: [8, 9, 10, 11], 
-                answer: 9 
-            },
-            { 
-                q: "8 + 7 = ...",
-                v: "🍎🍎🍎🍎🍎🍎🍎🍎 <br>+<br> 🍎🍎🍎🍎🍎🍎🍎",
-                options: [14, 15, 16, 17], 
-                answer: 15 
-            }
-        ];
-
-        let currentQuizIndex = 0;
-        let score = 0;
-
-        function startQuiz() {
-            currentQuizIndex = 0;
-            score = 0;
-            updateQuizScore();
-            loadQuiz();
-        }
-
-        function loadQuiz() {
-            if (currentQuizIndex >= quizData.length) {
-                nav('screen-end');
-                return;
-            }
-
-            // Hentikan suara jika masih membacakan soal sebelumnya
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-            }
-
-            const quiz = quizData[currentQuizIndex];
+            // Initialize special screens
+            if (screenIndex === 2) resetApples();
+            if (screenIndex === 6) playSo
