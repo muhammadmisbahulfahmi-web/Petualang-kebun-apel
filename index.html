@@ -50,6 +50,11 @@
             overflow: hidden;
         }
 
+        /* WAJIB: Memastikan sentuhan di HP dieksekusi instan tanpa delay zoom/scroll */
+        button, .module-card, .balloon, select {
+            touch-action: manipulation;
+        }
+
         /* ================= ANIMATIONS ================= */
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
@@ -63,16 +68,11 @@
             0% { transform: scale(0.9); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
 
         /* ================= LAYOUT ================= */
         .app-container {
             width: 100%;
-            max-width: 480px; /* Mobile width */
+            max-width: 480px;
             height: 100%;
             background-color: var(--bg-app);
             position: relative;
@@ -82,14 +82,13 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
 
-        /* Pages */
         .page {
             display: none;
             flex-direction: column;
             width: 100%;
             height: 100%;
             overflow-y: auto;
-            padding: 20px 20px 80px 20px; /* bottom padding for nav */
+            padding: 20px 20px 80px 20px;
             animation: popIn 0.3s ease-out;
         }
         .page.active {
@@ -98,7 +97,6 @@
 
         /* ================= UI COMPONENTS ================= */
         
-        /* Top Header Card */
         .header-card {
             background: var(--header-grad);
             border-radius: 24px;
@@ -140,16 +138,15 @@
             width: 85%;
         }
 
-        /* Nav Pills (Horizontal Scroll) */
         .nav-pills {
             display: flex;
             gap: 10px;
             overflow-x: auto;
             padding-bottom: 15px;
             margin-bottom: 5px;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
-        .nav-pills::-webkit-scrollbar { display: none; } /* Chrome */
+        .nav-pills::-webkit-scrollbar { display: none; }
         
         .pill-btn {
             background: white;
@@ -175,13 +172,13 @@
         }
         .pill-btn:active { transform: scale(0.95); }
 
-        /* Content Cards */
         .content-card {
             background: var(--card-bg);
             border-radius: 24px;
             padding: 20px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.04);
             margin-bottom: 20px;
+            position: relative;
         }
         .card-title {
             font-size: 1.3rem;
@@ -200,7 +197,6 @@
         }
         .card-desc strong { color: var(--text-dark); }
 
-        /* Interactive Box (Light Blue) */
         .interactive-box {
             background: var(--box-bg);
             border-radius: 20px;
@@ -236,7 +232,6 @@
             letter-spacing: 2px;
         }
 
-        /* Buttons */
         .btn-full {
             width: 100%;
             padding: 14px;
@@ -253,27 +248,13 @@
         }
         .btn-full:active { transform: translateY(2px); }
         
-        .btn-yellow {
-            background: var(--yellow-main);
-            color: #78350F;
-            box-shadow: 0 4px 0 #F59E0B;
-        }
+        .btn-yellow { background: var(--yellow-main); color: #78350F; box-shadow: 0 4px 0 #F59E0B; }
         .btn-yellow:active { box-shadow: 0 0px 0 #F59E0B; }
-        
-        .btn-blue {
-            background: var(--primary-blue);
-            color: white;
-            box-shadow: 0 4px 0 var(--primary-blue-hover);
-        }
+        .btn-blue { background: var(--primary-blue); color: white; box-shadow: 0 4px 0 var(--primary-blue-hover); }
         .btn-blue:active { box-shadow: 0 0px 0 var(--primary-blue-hover); }
+        .btn-red { background: var(--danger); color: white; box-shadow: 0 4px 0 #B91C1C; }
+        .btn-red:active { box-shadow: 0 0px 0 #B91C1C; }
 
-        .btn-red {
-            background: var(--danger);
-            color: white;
-            box-shadow: 0 4px 0 #B91C1C;
-        }
-
-        /* Lisan Note */
         .lisan-note {
             background: #FEF3C7;
             padding: 15px;
@@ -285,7 +266,6 @@
             line-height: 1.4;
         }
 
-        /* Options Grid (For Quizzes) */
         .options-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -308,7 +288,6 @@
         .opt-btn.correct { background: var(--success); color: white; border-color: #059669; box-shadow: 0 4px 0 #059669; }
         .opt-btn.wrong { background: var(--danger); color: white; border-color: #B91C1C; box-shadow: 0 4px 0 #B91C1C; }
 
-        /* Game specific */
         .game-area {
             position: relative;
             width: 100%;
@@ -334,6 +313,7 @@
             font-size: 1.3rem;
             cursor: pointer;
             box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
+            z-index: 10;
         }
         .balloon::after {
             content: '';
@@ -346,7 +326,6 @@
             background: #94A3B8;
         }
 
-        /* Number Line */
         .nl-wrapper { display: flex; align-items: center; margin: 20px 0; padding-bottom: 40px; position: relative; overflow-x: auto; scrollbar-width: none;}
         .nl-tick { display: flex; flex-direction: column; align-items: center; width: 45px; position: relative; flex-shrink: 0; }
         .nl-line { width: 45px; height: 4px; background: var(--text-gray); position: absolute; top: 12px; left: 22px; z-index: 1; }
@@ -357,19 +336,19 @@
         #nl-frog {
             position: absolute;
             top: -25px;
-            left: 10px; /* Offset for 0 */
+            left: 10px;
             font-size: 2.5rem;
             transition: left 0.5s ease-in-out;
             z-index: 10;
         }
         .jumping { animation: bounce 0.4s; }
 
-        /* HUD & Controls */
         .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            position: relative;
         }
         .btn-back {
             background: white;
@@ -380,7 +359,7 @@
             color: var(--text-gray);
             cursor: pointer;
             position: relative;
-            z-index: 50;
+            z-index: 999; /* Pastikan selalu bisa diklik */
         }
         
         .floating-stats {
@@ -397,17 +376,12 @@
             gap: 15px;
             font-weight: 800;
             font-size: 1.1rem;
-            z-index: 100;
+            z-index: 1000;
             border: 1px solid var(--border-light);
             width: max-content;
         }
 
-        /* Grid for module cards */
-        .module-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
+        .module-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .module-card {
             background: white;
             border: 2px solid var(--border-light);
@@ -419,8 +393,8 @@
             transition: transform 0.1s;
         }
         .module-card:active { transform: translateY(4px); box-shadow: 0 0px 0 var(--border-light); }
-        .module-icon { font-size: 3rem; margin-bottom: 10px; }
-        .module-title { font-weight: 800; font-size: 1rem; color: var(--text-dark); }
+        .module-icon { font-size: 3rem; margin-bottom: 10px; pointer-events: none; }
+        .module-title { font-weight: 800; font-size: 1rem; color: var(--text-dark); pointer-events: none; }
 
     </style>
 </head>
@@ -430,14 +404,13 @@
     <div class="floating-stats" id="hud">
         <span id="score-stars">⭐ 0</span>
         <span id="score-points">🏅 0</span>
-        <span style="cursor:pointer;" onclick="toggleAudio()" id="btn-audio">🔊</span>
+        <span style="cursor:pointer;" onclick="toggleAudio()" id="btn-audio" role="button">🔊</span>
     </div>
 
     <div class="app-container">
 
         <!-- ================= PAGE: HOME / DASHBOARD ================= -->
         <section id="page-home" class="page active">
-            <!-- Header Card -->
             <div class="header-card">
                 <div class="badge">MATEMATIKA • FASE A</div>
                 <div class="mascot-img">🧸</div>
@@ -447,11 +420,11 @@
 
             <!-- Navigation Pills -->
             <div class="nav-pills">
-                <button id="pill-pemantik" class="pill-btn active" onclick="switchTab('pemantik', this)">🌟 Mulai</button>
-                <button id="pill-penjumlahan" class="pill-btn" onclick="switchTab('penjumlahan', this)">➕ Penjumlahan</button>
-                <button id="pill-pengurangan" class="pill-btn" onclick="switchTab('pengurangan', this)">➖ Pengurangan</button>
-                <button id="pill-latihan" class="pill-btn" onclick="switchTab('latihan', this)">🎯 Latihan</button>
-                <button id="pill-tantangan" class="pill-btn" onclick="switchTab('tantangan', this)">🏡 Tantangan</button>
+                <button type="button" id="pill-pemantik" class="pill-btn active" onclick="switchTab('pemantik', this)">🌟 Mulai</button>
+                <button type="button" id="pill-penjumlahan" class="pill-btn" onclick="switchTab('penjumlahan', this)">➕ Penjumlahan</button>
+                <button type="button" id="pill-pengurangan" class="pill-btn" onclick="switchTab('pengurangan', this)">➖ Pengurangan</button>
+                <button type="button" id="pill-latihan" class="pill-btn" onclick="switchTab('latihan', this)">🎯 Latihan</button>
+                <button type="button" id="pill-tantangan" class="pill-btn" onclick="switchTab('tantangan', this)">🏡 Tantangan</button>
             </div>
 
             <!-- Tab Content: PEMANTIK -->
@@ -465,39 +438,32 @@
                         <div class="dashed-container">
                             <span class="emoji-item">🍎</span><span class="emoji-item">🍎</span><span class="emoji-item">🍎</span><span class="emoji-item">🍎</span><span class="emoji-item">🍎</span>
                         </div>
-
                         <div class="box-label">Apel Beni</div>
                         <div class="dashed-container">
                             <span class="emoji-item">🍎</span><span class="emoji-item">🍎</span><span class="emoji-item">🍎</span>
                         </div>
-
                         <div class="equation" id="eq-pemantik">5 + 3 = ?</div>
 
-                        <button class="btn-full btn-yellow" onclick="hintPemantik()" style="margin-bottom: 15px;">💡 Lihat petunjuk</button>
-                        <button class="btn-full btn-blue" onclick="switchTab('penjumlahan', document.getElementById('pill-penjumlahan'))">Ayo belajar penjumlahan →</button>
-                    </div>
-                    
-                    <div class="lisan-note">
-                        Pertanyaan lisan: Pernahkah kamu menggabungkan kelereng, pensil, atau mainanmu dengan milik teman?
+                        <button type="button" class="btn-full btn-yellow" onclick="hintPemantik()" style="margin-bottom: 15px;">💡 Lihat petunjuk</button>
+                        <button type="button" class="btn-full btn-blue" onclick="switchTab('penjumlahan', document.getElementById('pill-penjumlahan'))">Ayo belajar penjumlahan →</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab Content: PENJUMLAHAN (Menu) -->
+            <!-- Tab Content: PENJUMLAHAN -->
             <div id="tab-penjumlahan" class="tab-content" style="display: none;">
                 <div class="content-card">
                     <h2 class="card-title">➕ Ayo Belajar Penjumlahan</h2>
-                    <p class="card-desc">Pilih materi yang ingin kamu pelajari hari ini:</p>
                     <div class="module-grid">
-                        <div class="module-card" onclick="openPage('page-materi-jumlah')">
+                        <div class="module-card" onclick="openPage('page-materi-jumlah')" role="button">
                             <div class="module-icon">🍓</div>
                             <div class="module-title">Konsep Gabung</div>
                         </div>
-                        <div class="module-card" onclick="openPage('page-simulasi')">
+                        <div class="module-card" onclick="openPage('page-simulasi')" role="button">
                             <div class="module-icon">🧸</div>
                             <div class="module-title">Benda Konkret</div>
                         </div>
-                        <div class="module-card" onclick="openPage('page-garis-bilangan')" style="grid-column: span 2;">
+                        <div class="module-card" onclick="openPage('page-garis-bilangan')" style="grid-column: span 2;" role="button">
                             <div class="module-icon">🐸</div>
                             <div class="module-title">Garis Bilangan</div>
                         </div>
@@ -505,21 +471,20 @@
                 </div>
             </div>
 
-            <!-- Tab Content: PENGURANGAN (Menu) -->
+            <!-- Tab Content: PENGURANGAN -->
             <div id="tab-pengurangan" class="tab-content" style="display: none;">
                 <div class="content-card">
                     <h2 class="card-title">➖ Ayo Belajar Pengurangan</h2>
-                    <p class="card-desc">Pilih materi yang ingin kamu pelajari hari ini:</p>
                     <div class="module-grid">
-                        <div class="module-card" onclick="openPage('page-materi-kurang')">
+                        <div class="module-card" onclick="openPage('page-materi-kurang')" role="button">
                             <div class="module-icon">🍬</div>
                             <div class="module-title">Konsep Ambil</div>
                         </div>
-                        <div class="module-card" onclick="openPage('page-simulasi')">
+                        <div class="module-card" onclick="openPage('page-simulasi')" role="button">
                             <div class="module-icon">🧸</div>
                             <div class="module-title">Benda Konkret</div>
                         </div>
-                        <div class="module-card" onclick="openPage('page-garis-bilangan')" style="grid-column: span 2;">
+                        <div class="module-card" onclick="openPage('page-garis-bilangan')" style="grid-column: span 2;" role="button">
                             <div class="module-icon">🐸</div>
                             <div class="module-title">Garis Bilangan</div>
                         </div>
@@ -527,14 +492,27 @@
                 </div>
             </div>
 
-            <!-- Tab Content: LATIHAN (Menu Games & Kuis) -->
+            <!-- Tab Content: LATIHAN -->
             <div id="tab-latihan" class="tab-content" style="display: none;">
                 <div class="content-card">
                     <h2 class="card-title">🎯 Ayo Berlatih</h2>
-                    <p class="card-desc">Pilih permainan seru untuk menguji kemampuanmu!</p>
                     <div class="module-grid">
-                        <div class="module-card" onclick="openPage('page-game-balon')">
+                        <div class="module-card" onclick="openPage('page-game-balon')" role="button">
                             <div class="module-icon">🎈</div>
                             <div class="module-title">Tangkap Balon</div>
                         </div>
-     
+                        <div class="module-card" onclick="openPage('page-game-hitung')" role="button">
+                            <div class="module-icon">🔍</div>
+                            <div class="module-title">Hitung Benda</div>
+                        </div>
+                        <div class="module-card" onclick="openPage('page-kuis')" style="grid-column: span 2;" role="button">
+                            <div class="module-icon">🏆</div>
+                            <div class="module-title">Kuis Tantangan</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: TANTANGAN -->
+            <div id="tab-tantangan" class="tab-content" style="display: none;">
+   
