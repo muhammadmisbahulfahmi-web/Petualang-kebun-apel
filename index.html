@@ -152,6 +152,11 @@
                         <!-- Options injected here -->
                     </div>
                 </div>
+
+                <!-- NEW: Tombol Kembali agar anak tidak terjebak di dalam Kuis -->
+                <div class="mt-4 flex justify-start">
+                    <button onclick="nav('screen-sub')" class="bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-3 px-6 rounded-2xl active:scale-95 transition-all w-full md:w-auto shadow-sm">⬅️ Kembali ke Materi</button>
+                </div>
             </div>
 
             <!-- SCREEN 5: PENUTUP & TANTANGAN -->
@@ -213,6 +218,14 @@
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
             }
         }
 
@@ -234,6 +247,9 @@
         const screens = ['screen-home', 'screen-add', 'screen-sub', 'screen-quiz', 'screen-end'];
         
         function nav(targetId) {
+            playSound('click'); // Tambahkan efek suara klik untuk navigasi
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel(); // Hentikan narator jika pindah halaman
+
             screens.forEach(id => {
                 document.getElementById(id).classList.add('hidden');
                 document.getElementById(id).classList.remove('flex');
@@ -254,21 +270,31 @@
 
         function updateAdd(color, change) {
             let total = countRed + countGreen;
+            let success = false;
             
             if (color === 'red') {
-                if (countRed + change >= 0 && total + change <= maxTotal) countRed += change;
+                if (countRed + change >= 0 && total + change <= maxTotal) {
+                    countRed += change;
+                    success = true;
+                }
             } else {
-                if (countGreen + change >= 0 && total + change <= maxTotal) countGreen += change;
+                if (countGreen + change >= 0 && total + change <= maxTotal) {
+                    countGreen += change;
+                    success = true;
+                }
             }
 
             document.getElementById('count-red').innerText = countRed;
             document.getElementById('count-green').innerText = countGreen;
             document.getElementById('total-add').innerText = countRed + countGreen;
 
-            // Mainkan suara pop jika ada perubahan
-            if(change !== 0) playSound('pop');
-
-            renderAddVisuals();
+            // Mainkan suara pop jika berhasil, atau tet-tot jika mencapai limit/batas (kurang dari 0 atau lebih dari 20)
+            if (success) {
+                if (change !== 0) playSound('pop');
+                renderAddVisuals();
+            } else if (change !== 0) {
+                playSound('wrong'); 
+            }
         }
 
         function renderAddVisuals() {
@@ -289,6 +315,7 @@
         let subTotal = 20;
         
         function resetSub() {
+            playSound('click');
             subTotal = 20;
             updateSubUI();
         }
@@ -366,34 +393,3 @@
             }
 
             const quiz = quizData[currentQuizIndex];
-            document.getElementById('quiz-num').innerText = currentQuizIndex + 1;
-            document.getElementById('quiz-question').innerHTML = quiz.q;
-            document.getElementById('quiz-visual').innerHTML = quiz.v;
-
-            const optionsContainer = document.getElementById('quiz-options');
-            optionsContainer.innerHTML = '';
-            
-            // Shuffle options visually
-            let opts = [...quiz.options].sort(() => Math.random() - 0.5);
-
-            opts.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = "bg-sky-100 hover:bg-sky-200 text-sky-700 font-bold py-4 rounded-2xl text-2xl border-2 border-sky-300 active:scale-95 transition-all";
-                btn.innerText = opt;
-                btn.onclick = () => checkAnswer(opt, quiz.answer, btn);
-                optionsContainer.appendChild(btn);
-            });
-        }
-
-        function checkAnswer(selected, correct, btnElement) {
-            const optionsContainer = document.getElementById('quiz-options');
-            // Disable all buttons immediately
-            const allBtns = optionsContainer.querySelectorAll('button');
-            allBtns.forEach(b => b.style.pointerEvents = 'none');
-
-            // Hentikan suara jika sedang membacakan
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-
-            if (selected === correct) {
-                playSound('correct'); // Suara Benar
-     
