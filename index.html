@@ -3,792 +3,538 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Petualangan Angka Bersama BIMO</title>
-    <!-- Tailwind CSS v4 CDN -->
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <title>Petualangan Angka sampai 20!</title>
     <style>
-        /* Custom Animations */
+        /* ================= CSS VARIABLES & FONTS ================= */
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+        :root {
+            --bg-app: #F5F7FA;
+            --card-bg: #FFFFFF;
+            
+            /* Gradient Header */
+            --header-grad: linear-gradient(135deg, #4A72FF, #8C52FF);
+            
+            /* UI Colors */
+            --primary-blue: #3B82F6;
+            --primary-blue-hover: #2563EB;
+            --yellow-main: #FCD34D;
+            --yellow-hover: #FBBF24;
+            --box-bg: #F0F7FF;
+            --text-dark: #1E293B;
+            --text-gray: #475569;
+            --border-light: #E2E8F0;
+            --border-dashed: #CBD5E0;
+            
+            /* Status Colors */
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-app);
+            color: var(--text-dark);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* ================= ANIMATIONS ================= */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
         @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-20vh) rotate(20deg); opacity: 0; }
         }
-        @keyframes bounce-sm {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        @keyframes pop {
-            0% { transform: scale(0.8); opacity: 0; }
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        .animate-float { animation: float 3s ease-in-out infinite; }
-        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .animate-bounce-sm { animation: bounce-sm 2s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* ================= LAYOUT ================= */
+        .app-container {
+            width: 100%;
+            max-width: 480px; /* Mobile width */
+            height: 100%;
+            background-color: var(--bg-app);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px 20px 80px 20px; /* bottom padding for nav */
+            animation: popIn 0.3s ease-out;
+        }
+        .page.active {
+            display: flex;
+        }
+
+        /* ================= UI COMPONENTS ================= */
         
-        /* Disable text selection for app-like feel */
-        body { user-select: none; -webkit-user-select: none; touch-action: manipulation; background-color: #f0f9ff; }
+        /* Top Header Card */
+        .header-card {
+            background: var(--header-grad);
+            border-radius: 24px;
+            padding: 25px 20px;
+            color: white;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(74, 114, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        .badge {
+            background: #FFE4A0;
+            color: #78350F;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .mascot-img {
+            position: absolute;
+            top: 20px;
+            right: 15px;
+            font-size: 3.5rem;
+            animation: bounce 3s infinite;
+        }
+        .header-card h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            width: 75%;
+        }
+        .header-card p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            line-height: 1.4;
+            width: 85%;
+        }
+
+        /* Nav Pills (Horizontal Scroll) */
+        .nav-pills {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            margin-bottom: 5px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .nav-pills::-webkit-scrollbar { display: none; } /* Chrome */
         
-        /* Hide scrollbar */
-        ::-webkit-scrollbar { width: 0px; }
+        .pill-btn {
+            background: white;
+            border: 1.5px solid var(--border-light);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-gray);
+            white-space: nowrap;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pill-btn.active {
+            background: var(--yellow-main);
+            border-color: #F59E0B;
+            color: #78350F;
+            box-shadow: 0 4px 10px rgba(252, 211, 77, 0.4);
+        }
+        .pill-btn:active { transform: scale(0.95); }
+
+        /* Content Cards */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-desc {
+            font-size: 1rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .card-desc strong { color: var(--text-dark); }
+
+        /* Interactive Box (Light Blue) */
+        .interactive-box {
+            background: var(--box-bg);
+            border-radius: 20px;
+            padding: 20px;
+        }
+        .box-label {
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        .dashed-container {
+            background: white;
+            border: 2px dashed var(--border-dashed);
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+        .emoji-item {
+            font-size: 2rem;
+            animation: popIn 0.3s ease-out;
+        }
+        .equation {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 15px 0;
+            letter-spacing: 2px;
+        }
+
+        /* Buttons */
+        .btn-full {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-full:active { transform: translateY(2px); }
         
-        /* Screen Management */
-        .screen { display: none; }
-        .screen.active { display: flex; flex-direction: column; animation: pop 0.4s ease-out; }
-    </style>
-</head>
-<body class="text-slate-800 font-sans h-screen w-screen overflow-hidden flex justify-center items-center">
-
-    <!-- MAIN APP CONTAINER (Mobile First) -->
-    <div id="app" class="relative w-full h-full max-w-md bg-gradient-to-b from-sky-300 to-sky-100 shadow-2xl overflow-hidden sm:rounded-3xl sm:h-[95vh] sm:border-4 border-sky-400 flex flex-col">
+        .btn-yellow {
+            background: var(--yellow-main);
+            color: #78350F;
+            box-shadow: 0 4px 0 #F59E0B;
+        }
+        .btn-yellow:active { box-shadow: 0 0px 0 #F59E0B; }
         
-        <!-- TOP NAVIGATION (Hidden on Welcome Screen) -->
-        <div id="top-nav" class="hidden w-full p-4 flex justify-between items-center bg-white/40 backdrop-blur-sm z-10 rounded-b-2xl">
-            <button id="btn-back" class="bg-white p-2 rounded-full shadow-md text-sky-600 hover:bg-sky-50 active:scale-95 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-            <div class="flex items-center gap-2 bg-white px-4 py-1.5 rounded-full shadow-md">
-                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                <span id="star-count" class="font-bold text-lg text-yellow-600">0</span>
-            </div>
-            <button id="btn-sound" class="bg-white p-2 rounded-full shadow-md text-sky-600 hover:bg-sky-50 active:scale-95 transition">
-                <svg id="icon-sound-on" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5 10v4a2 2 0 002 2h2.586l3.707 3.707a1 1 0 001.707-.707V4.95a1 1 0 00-1.707-.707L9.586 8H7a2 2 0 00-2 2z"></path></svg>
-                <svg id="icon-sound-off" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z m9.172-1.172a4 4 0 000-5.656m-2.828 8.485a8 8 0 000-11.314"></path></svg>
-            </button>
-        </div>
+        .btn-blue {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 0 var(--primary-blue-hover);
+        }
+        .btn-blue:active { box-shadow: 0 0px 0 var(--primary-blue-hover); }
 
-        <!-- CONTENT AREA -->
-        <div id="content-area" class="flex-1 overflow-y-auto p-4 pb-10 w-full h-full">
+        .btn-red {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 0 #B91C1C;
+        }
 
-            <!-- SCREEN 1: WELCOME -->
-            <div id="screen-welcome" class="screen active h-full justify-center items-center text-center">
-                <h1 class="text-4xl font-extrabold text-sky-800 drop-shadow-md mb-2">PETUALANGAN ANGKA</h1>
-                <p class="text-lg font-medium text-sky-700 mb-8 bg-white/50 px-4 py-1 rounded-full">Belajar Hitung Jadi Menyenangkan!</p>
-                
-                <!-- BIMO Robot SVG -->
-                <div class="animate-float mb-8">
-                    <svg viewBox="0 0 100 100" class="w-48 h-48 drop-shadow-xl">
-                        <!-- Antenna -->
-                        <line x1="50" y1="15" x2="50" y2="25" stroke="#94a3b8" stroke-width="4"/>
-                        <circle cx="50" cy="15" r="5" fill="#facc15" class="animate-pulse"/>
-                        <!-- Head/Body -->
-                        <rect x="20" y="25" width="60" height="55" rx="15" fill="#38bdf8"/>
-                        <rect x="25" y="30" width="50" height="45" rx="10" fill="#0284c7"/>
-                        <!-- Eyes -->
-                        <rect x="32" y="40" width="12" height="15" rx="4" fill="#fff"/>
-                        <rect x="56" y="40" width="12" height="15" rx="4" fill="#fff"/>
-                        <circle cx="38" cy="48" r="3" fill="#0f172a"/>
-                        <circle cx="62" cy="48" r="3" fill="#0f172a"/>
-                        <!-- Smile -->
-                        <path d="M 35 60 Q 50 75 65 60" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
-                        <!-- Arms -->
-                        <rect x="5" y="40" width="15" height="10" rx="3" fill="#38bdf8"/>
-                        <rect x="80" y="40" width="15" height="10" rx="3" fill="#38bdf8"/>
-                    </svg>
-                </div>
+        /* Lisan Note */
+        .lisan-note {
+            background: #FEF3C7;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: #92400E;
+            margin-top: 15px;
+            border-left: 5px solid #F59E0B;
+            line-height: 1.4;
+        }
 
-                <button onclick="startGame()" class="bg-gradient-to-b from-yellow-300 to-yellow-500 text-yellow-900 text-2xl font-bold py-4 px-10 rounded-full shadow-[0_6px_0_#ca8a04] hover:shadow-[0_4px_0_#ca8a04] hover:translate-y-1 transition active:shadow-none active:translate-y-2 mb-4 w-full max-w-[280px]">
-                    MULAI BELAJAR
-                </button>
-                
-                <p class="text-sm text-slate-600 font-medium">Aktifkan suara perangkatmu ya!</p>
-            </div>
+        /* Options Grid (For Quizzes) */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .opt-btn {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 16px;
+            padding: 15px 10px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--border-light);
+            transition: transform 0.1s;
+        }
+        .opt-btn:active { transform: translateY(4px); box-shadow: 0 0px 0 var(--border-light); }
+        .opt-btn.correct { background: var(--success); color: white; border-color: #059669; box-shadow: 0 4px 0 #059669; }
+        .opt-btn.wrong { background: var(--danger); color: white; border-color: #B91C1C; box-shadow: 0 4px 0 #B91C1C; }
 
-            <!-- SCREEN 2: MAIN MENU -->
-            <div id="screen-menu" class="screen justify-start items-center">
-                <div class="flex items-center gap-3 mb-6 bg-white p-3 rounded-2xl shadow-sm w-full">
-                    <div class="w-16 h-16 bg-sky-100 rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
-                        <svg viewBox="0 0 100 100" class="w-12 h-12"><rect x="20" y="25" width="60" height="55" rx="15" fill="#38bdf8"/><rect x="32" y="40" width="12" height="15" rx="4" fill="#fff"/><rect x="56" y="40" width="12" height="15" rx="4" fill="#fff"/><path d="M 35 60 Q 50 75 65 60" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
-                    </div>
-                    <div>
-                        <h2 class="font-bold text-lg text-sky-800">Halo, aku BIMO!</h2>
-                        <p class="text-sm text-sky-600 leading-tight">Pilih petualanganmu hari ini.</p>
-                    </div>
-                </div>
+        /* Game specific */
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: var(--box-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 2px solid var(--border-light);
+        }
+        .balloon {
+            position: absolute;
+            bottom: -80px;
+            width: 60px;
+            height: 80px;
+            background: #EF4444;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
+        }
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: #94A3B8;
+        }
 
-                <div class="grid grid-cols-2 gap-4 w-full">
-                    <button onclick="nav('apperception')" class="col-span-2 bg-gradient-to-r from-purple-400 to-purple-500 p-4 rounded-2xl shadow-[0_5px_0_#9333ea] active:translate-y-1 active:shadow-[0_2px_0_#9333ea] text-white flex items-center justify-between transition">
-                        <div class="text-left"><h3 class="font-bold text-xl">Cerita Pembuka</h3><p class="text-sm opacity-90">Bantu Ibu di Pasar</p></div>
-                        <div class="text-4xl">🍎</div>
-                    </button>
-                    
-                    <button onclick="nav('materi1')" class="bg-blue-400 p-4 rounded-2xl shadow-[0_5px_0_#2563eb] active:translate-y-1 text-white text-left">
-                        <div class="text-3xl mb-2">1️⃣2️⃣</div>
-                        <h3 class="font-bold">Mengenal<br>Angka 1-20</h3>
-                    </button>
-                    <button onclick="nav('materi2')" class="bg-green-400 p-4 rounded-2xl shadow-[0_5px_0_#16a34a] active:translate-y-1 text-white text-left">
-                        <div class="text-3xl mb-2">➕</div>
-                        <h3 class="font-bold">Belajar<br>Penjumlahan</h3>
-                    </button>
-                    <button onclick="nav('materi3')" class="bg-red-400 p-4 rounded-2xl shadow-[0_5px_0_#dc2626] active:translate-y-1 text-white text-left">
-                        <div class="text-3xl mb-2">➖</div>
-                        <h3 class="font-bold">Belajar<br>Pengurangan</h3>
-                    </button>
-                    <button onclick="nav('materi4')" class="bg-orange-400 p-4 rounded-2xl shadow-[0_5px_0_#ea580c] active:translate-y-1 text-white text-left">
-                        <div class="text-3xl mb-2">✏️</div>
-                        <h3 class="font-bold">Latihan<br>Berhitung</h3>
-                    </button>
+        /* Number Line */
+        .nl-wrapper { display: flex; align-items: center; margin: 20px 0; padding-bottom: 40px; position: relative; overflow-x: auto; scrollbar-width: none;}
+        .nl-tick { display: flex; flex-direction: column; align-items: center; width: 45px; position: relative; flex-shrink: 0; }
+        .nl-line { width: 45px; height: 4px; background: var(--text-gray); position: absolute; top: 12px; left: 22px; z-index: 1; }
+        .nl-tick:last-child .nl-line { display: none; }
+        .nl-marker { width: 28px; height: 28px; border-radius: 50%; background: white; border: 3px solid var(--text-gray); z-index: 2; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.8rem; }
+        .nl-number { margin-top: 8px; font-weight: 800; font-size: 1.1rem; color: var(--text-dark); }
+        
+        #nl-frog {
+            position: absolute;
+            top: -25px;
+            left: 10px; /* Offset for 0 */
+            font-size: 2.5rem;
+            transition: left 0.5s ease-in-out;
+            z-index: 10;
+        }
+        .jumping { animation: bounce 0.4s; }
 
-                    <h3 class="col-span-2 font-bold text-sky-800 mt-2 border-b-2 border-sky-200 pb-1">Arena Bermain & Ujian</h3>
-
-                    <button onclick="startInteractive('game1')" class="col-span-2 bg-teal-400 p-4 rounded-2xl shadow-[0_5px_0_#0d9488] active:translate-y-1 text-white flex items-center gap-3">
-                        <div class="text-3xl bg-white/20 p-2 rounded-lg">🕹️</div>
-                        <div class="text-left"><h3 class="font-bold text-lg">Game: Hitung Benda</h3></div>
-                    </button>
-                    <button onclick="startInteractive('game2')" class="col-span-2 bg-indigo-400 p-4 rounded-2xl shadow-[0_5px_0_#4f46e5] active:translate-y-1 text-white flex items-center gap-3">
-                        <div class="text-3xl bg-white/20 p-2 rounded-lg">🚀</div>
-                        <div class="text-left"><h3 class="font-bold text-lg">Game: Penjumlahan</h3></div>
-                    </button>
-                    <button onclick="startInteractive('game3')" class="col-span-2 bg-rose-400 p-4 rounded-2xl shadow-[0_5px_0_#e11d48] active:translate-y-1 text-white flex items-center gap-3">
-                        <div class="text-3xl bg-white/20 p-2 rounded-lg">🎯</div>
-                        <div class="text-left"><h3 class="font-bold text-lg">Game: Pengurangan</h3></div>
-                    </button>
-
-                    <button onclick="startInteractive('quiz')" class="bg-yellow-400 text-yellow-900 p-4 rounded-2xl shadow-[0_5px_0_#ca8a04] active:translate-y-1 text-center font-bold text-lg">
-                        📝 Kuis Evaluasi
-                    </button>
-                    <button onclick="startInteractive('challenge')" class="bg-sky-500 text-white p-4 rounded-2xl shadow-[0_5px_0_#0284c7] active:translate-y-1 text-center font-bold text-lg">
-                        🛒 Misi Belanja
-                    </button>
-                </div>
-            </div>
-
-            <!-- SCREEN 3: APPERCEPTION -->
-            <div id="screen-apperception" class="screen justify-between h-full">
-                <div class="bg-white p-4 rounded-2xl shadow-md border-2 border-sky-100 mb-4">
-                    <p id="app-story-text" class="text-lg font-medium text-slate-700">BIMO memiliki 5 apel. Ibu memberikan 3 apel lagi. Berapa jumlah apel BIMO sekarang?</p>
-                </div>
-                
-                <div class="flex-1 flex flex-col items-center justify-center bg-blue-50 rounded-2xl border-2 border-blue-200 mb-4 p-4">
-                    <div id="app-stage-1" class="flex flex-wrap gap-2 justify-center w-full min-h-[60px] mb-4"></div>
-                    <div class="text-3xl font-bold text-sky-400 mb-4">+</div>
-                    <div id="app-stage-2" class="flex flex-wrap gap-2 justify-center w-full min-h-[60px]"></div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="speak('BIMO memiliki 5 apel. Ibu memberikan 3 apel lagi. Berapa jumlah apel BIMO sekarang?')" class="bg-sky-200 text-sky-800 p-3 rounded-xl font-bold shadow-sm active:scale-95">Dengarkan</button>
-                    <button onclick="runApperceptionAnim()" class="bg-green-400 text-white p-3 rounded-xl font-bold shadow-sm active:scale-95">Coba Hitung</button>
-                </div>
-            </div>
-
-            <!-- SCREEN 4: MATERI 1 (ANGKA 1-20) -->
-            <div id="screen-materi1" class="screen">
-                <h2 class="text-2xl font-bold text-sky-800 mb-4 text-center">Tekan Angka!</h2>
-                <div class="grid grid-cols-4 gap-3" id="angka-grid">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-
-            <!-- SCREEN 5: MATERI 2 (PENJUMLAHAN SIMULATOR) -->
-            <div id="screen-materi2" class="screen h-full flex flex-col">
-                <h2 class="text-2xl font-bold text-green-700 mb-2 text-center bg-green-100 p-2 rounded-xl">Penjumlahan</h2>
-                <p class="text-center text-sm text-slate-600 mb-4">Pilih angka dan lihat apel bergabung!</p>
-                
-                <div class="flex justify-center items-center gap-2 mb-4">
-                    <select id="add-n1" class="text-2xl p-2 rounded-xl border-2 border-green-300 font-bold outline-none bg-white text-center w-16"></select>
-                    <span class="text-2xl font-bold text-green-500">+</span>
-                    <select id="add-n2" class="text-2xl p-2 rounded-xl border-2 border-green-300 font-bold outline-none bg-white text-center w-16"></select>
-                    <button onclick="simAddition()" class="bg-green-500 text-white p-3 rounded-xl font-bold shadow-[0_4px_0_#16a34a] active:translate-y-1 ml-2">=</button>
-                </div>
-                
-                <div id="add-result-text" class="text-3xl font-extrabold text-center text-green-600 mb-4 min-h-[40px]"></div>
-                
-                <div class="flex-1 bg-white rounded-2xl shadow-inner border-2 border-slate-100 p-4 flex flex-wrap content-start justify-center gap-2 overflow-y-auto" id="add-visual-stage">
-                </div>
-            </div>
-
-            <!-- SCREEN 6: MATERI 3 (PENGURANGAN SIMULATOR) -->
-            <div id="screen-materi3" class="screen h-full flex flex-col">
-                <h2 class="text-2xl font-bold text-red-700 mb-2 text-center bg-red-100 p-2 rounded-xl">Pengurangan</h2>
-                <p class="text-center text-sm text-slate-600 mb-4">Pilih jumlah jeruk dan berapa yang diambil.</p>
-                
-                <div class="flex justify-center items-center gap-2 mb-4">
-                    <select id="sub-n1" class="text-2xl p-2 rounded-xl border-2 border-red-300 font-bold outline-none bg-white text-center w-20"></select>
-                    <span class="text-2xl font-bold text-red-500">-</span>
-                    <select id="sub-n2" class="text-2xl p-2 rounded-xl border-2 border-red-300 font-bold outline-none bg-white text-center w-16"></select>
-                    <button onclick="simSubtraction()" class="bg-red-500 text-white p-3 rounded-xl font-bold shadow-[0_4px_0_#dc2626] active:translate-y-1 ml-2">=</button>
-                </div>
-                
-                <div id="sub-result-text" class="text-3xl font-extrabold text-center text-red-600 mb-4 min-h-[40px]"></div>
-                
-                <div class="flex-1 bg-white rounded-2xl shadow-inner border-2 border-slate-100 p-4 flex flex-wrap content-start justify-center gap-2 overflow-y-auto" id="sub-visual-stage">
-                </div>
-            </div>
-
-            <!-- SCREEN 7: INTERACTIVE ENGINE (Games, Quiz, Challenge, Materi 4) -->
-            <div id="screen-interactive" class="screen h-full flex flex-col">
-                <div class="flex justify-between items-center mb-4">
-                    <div id="int-title" class="font-bold text-lg text-sky-800 bg-white px-4 py-1 rounded-full shadow-sm">Kuis</div>
-                    <div id="int-progress" class="font-bold text-sky-600">1 / 5</div>
-                </div>
-
-                <div class="bg-white p-4 rounded-2xl shadow-md border-2 border-sky-100 mb-4 text-center">
-                    <p id="int-question" class="text-xl font-bold text-slate-700 mb-4">Pertanyaan</p>
-                    <div id="int-visuals" class="flex flex-wrap justify-center gap-2 mb-4 min-h-[60px]">
-                        <!-- SVG objects injected here -->
-                    </div>
-                    <button onclick="speakInteractiveQuestion()" class="bg-sky-100 text-sky-700 text-sm py-1 px-4 rounded-full font-bold active:scale-95">🔊 Dengarkan Soal</button>
-                </div>
-
-                <div id="int-options" class="grid grid-cols-2 gap-4 mt-auto pb-4">
-                    <!-- Options injected here -->
-                </div>
-            </div>
-
-            <!-- SCREEN 8: RESULT PAGE -->
-            <div id="screen-result" class="screen justify-center items-center text-center h-full">
-                <h2 id="result-title" class="text-3xl font-bold text-sky-800 mb-2">Luar Biasa!</h2>
-                <div id="result-score-container" class="w-32 h-32 bg-yellow-400 rounded-full flex items-center justify-center border-4 border-yellow-200 shadow-lg mx-auto mb-4 animate-bounce-sm">
-                    <span id="result-score" class="text-5xl font-extrabold text-white drop-shadow-md">100</span>
-                </div>
-                <p id="result-msg" class="text-lg text-slate-600 font-medium mb-8">Kamu mendapatkan Bintang Jagoan!</p>
-                <div class="flex gap-4 w-full">
-                    <button id="btn-result-retry" class="flex-1 bg-sky-200 text-sky-800 py-3 rounded-xl font-bold active:scale-95">Ulangi</button>
-                    <button onclick="nav('menu')" class="flex-1 bg-green-500 text-white py-3 rounded-xl font-bold shadow-[0_4px_0_#16a34a] active:translate-y-1">Menu Utama</button>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- FULLSCREEN MODAL OVERLAY (Feedback) -->
-        <div id="modal-feedback" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-            <div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl transform scale-95 transition-transform" id="modal-content">
-                <div id="modal-icon" class="text-6xl mb-4 animate-pop">🌟</div>
-                <h3 id="modal-title" class="text-2xl font-bold text-slate-800 mb-2">Benar!</h3>
-                <p id="modal-desc" class="text-slate-600 font-medium mb-6">Hebat, jawabanmu tepat sekali.</p>
-                <button id="btn-modal-next" class="bg-sky-500 text-white w-full py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#0284c7] active:translate-y-1">Lanjut</button>
-            </div>
-        </div>
-
-        <!-- CONFETTI CANVAS -->
-        <canvas id="confetti" class="absolute inset-0 z-40 pointer-events-none hidden w-full h-full"></canvas>
-
-    </div>
-
-    <script>
-        /* ==========================================================================
-           1. ASSETS & UTILITIES
-           ========================================================================== */
-        const SVGs = {
-            apple: '<svg viewBox="0 0 100 100" class="w-10 h-10 inline-block animate-pop drop-shadow-sm"><path d="M 50 90 C 20 90 10 60 20 40 C 30 20 40 20 50 30 C 60 20 70 20 80 40 C 90 60 80 90 50 90 Z" fill="#ef4444"/><path d="M 50 30 Q 40 10 60 10 Q 55 20 50 30" fill="#22c55e" stroke="#16a34a" stroke-width="2"/></svg>',
-            orange: '<svg viewBox="0 0 100 100" class="w-10 h-10 inline-block animate-pop drop-shadow-sm"><circle cx="50" cy="55" r="40" fill="#f97316"/><path d="M 50 15 Q 40 5 60 5 Q 55 10 50 15" fill="#22c55e"/></svg>',
-            star: '<svg viewBox="0 0 100 100" class="w-10 h-10 inline-block animate-pop drop-shadow-sm"><polygon points="50,10 61,39 92,39 67,58 76,87 50,70 24,87 33,58 8,39 39,39" fill="#facc15" stroke="#ca8a04" stroke-width="2"/></svg>',
-            candy: '<svg viewBox="0 0 100 100" class="w-10 h-10 inline-block animate-pop drop-shadow-sm"><ellipse cx="50" cy="50" rx="25" ry="15" fill="#ec4899"/><polygon points="25,50 10,40 10,60" fill="#ec4899"/><polygon points="75,50 90,40 90,60" fill="#ec4899"/></svg>'
-        };
-
-        const generateSVGString = (type, count, opacity = 1) => {
-            let html = '';
-            for(let i=0; i<count; i++){
-                html += `<div style="opacity: ${opacity}; transition: opacity 0.3s">${SVGs[type] || SVGs.apple}</div>`;
-            }
-            return html;
-        };
-
-        /* ==========================================================================
-           2. STATE & AUDIO MANAGEMENT
-           ========================================================================== */
-        let state = {
-            screen: 'welcome',
-            stars: 0,
-            audioEnabled: true
-        };
-
-        // Load progress
-        if(localStorage.getItem('bimo_stars')) {
-            state.stars = parseInt(localStorage.getItem('bimo_stars'));
+        /* HUD & Controls */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .btn-back {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 8px 15px;
+            font-weight: 700;
+            color: var(--text-gray);
+            cursor: pointer;
+            position: relative;
+            z-index: 50;
         }
         
-        const updateStarsUI = () => {
-            document.getElementById('star-count').innerText = state.stars;
-            localStorage.setItem('bimo_stars', state.stars);
-        };
+        .floating-stats {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            z-index: 100;
+            border: 1px solid var(--border-light);
+            width: max-content;
+        }
 
-        const addStars = (num) => {
-            state.stars += num;
-            updateStarsUI();
-        };
+        /* Grid for module cards */
+        .module-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .module-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 20px;
+            padding: 20px 10px;
+            text-align: center;
+            box-shadow: 0 4px 0 var(--border-light);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .module-card:active { transform: translateY(4px); box-shadow: 0 0px 0 var(--border-light); }
+        .module-icon { font-size: 3rem; margin-bottom: 10px; }
+        .module-title { font-weight: 800; font-size: 1rem; color: var(--text-dark); }
 
-        // Audio System (Web Audio API)
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx;
+    </style>
+</head>
+<body onclick="initAudioContext()">
 
-        const initAudio = () => {
-            if(!audioCtx) audioCtx = new AudioContext();
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-        };
+    <!-- Floating Stats HUD -->
+    <div class="floating-stats" id="hud">
+        <span id="score-stars">⭐ 0</span>
+        <span id="score-points">🏅 0</span>
+        <span style="cursor:pointer;" onclick="toggleAudio()" id="btn-audio">🔊</span>
+    </div>
 
-        const playTone = (freq, type, duration, vol=0.1) => {
-            if(!state.audioEnabled || !audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
-        };
+    <div class="app-container">
 
-        const sfx = {
-            click: () => playTone(600, 'sine', 0.1, 0.05),
-            correct: () => { playTone(523.25, 'sine', 0.1); setTimeout(()=>playTone(659.25, 'sine', 0.2), 100); },
-            wrong: () => { playTone(300, 'sawtooth', 0.3, 0.05); },
-            pop: () => playTone(800, 'sine', 0.05, 0.05),
-            win: () => { 
-                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-                    setTimeout(() => playTone(f, 'square', 0.2, 0.05), i*150);
-                });
-            }
-        };
+        <!-- ================= PAGE: HOME / DASHBOARD ================= -->
+        <section id="page-home" class="page active">
+            <!-- Header Card -->
+            <div class="header-card">
+                <div class="badge">MATEMATIKA • FASE A</div>
+                <div class="mascot-img">🧸</div>
+                <h1>Petualangan Angka sampai 20!</h1>
+                <p>Yuk, berhitung sambil bermain dan menggunakan benda konkret.</p>
+            </div>
 
-        // Speech System (Web Speech API)
-        let currentUtterance = null;
-        const speak = (text, rate=0.9) => {
-            if(!state.audioEnabled || !('speechSynthesis' in window)) return;
-            window.speechSynthesis.cancel(); // stop previous
-            currentUtterance = new SpeechSynthesisUtterance(text);
-            currentUtterance.lang = 'id-ID';
-            currentUtterance.rate = rate;
-            
-            // Try to find a female Indonesian voice if available
-            const voices = window.speechSynthesis.getVoices();
-            const idVoice = voices.find(v => v.lang.includes('id') && (v.name.includes('Female') || v.name.includes('Perempuan')));
-            if(idVoice) currentUtterance.voice = idVoice;
-            
-            window.speechSynthesis.speak(currentUtterance);
-        };
+            <!-- Navigation Pills -->
+            <div class="nav-pills">
+                <button id="pill-pemantik" class="pill-btn active" onclick="switchTab('pemantik', this)">🌟 Mulai</button>
+                <button id="pill-penjumlahan" class="pill-btn" onclick="switchTab('penjumlahan', this)">➕ Penjumlahan</button>
+                <button id="pill-pengurangan" class="pill-btn" onclick="switchTab('pengurangan', this)">➖ Pengurangan</button>
+                <button id="pill-latihan" class="pill-btn" onclick="switchTab('latihan', this)">🎯 Latihan</button>
+                <button id="pill-tantangan" class="pill-btn" onclick="switchTab('tantangan', this)">🏡 Tantangan</button>
+            </div>
 
-        /* ==========================================================================
-           3. NAVIGATION & UI
-           ========================================================================== */
-        const nav = (targetScreen) => {
-            sfx.click();
-            window.speechSynthesis.cancel(); // Stop talking on screen change
-            
-            // Hide all
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            // Show target
-            document.getElementById(`screen-${targetScreen}`).classList.add('active');
-            
-            // Nav bar visibility
-            const topNav = document.getElementById('top-nav');
-            if(targetScreen === 'welcome') {
-                topNav.classList.add('hidden');
-            } else {
-                topNav.classList.remove('hidden');
-            }
+            <!-- Tab Content: PEMANTIK -->
+            <div id="tab-pemantik" class="tab-content">
+                <div class="content-card">
+                    <h2 class="card-title">🌟 Pemantik: Ada berapa buah apel?</h2>
+                    <p class="card-desc">Di kebun sekolah, Siti memetik <strong>5 apel</strong>. Beni datang membawa <strong>3 apel</strong> lagi. Berapa jumlah apel mereka sekarang?</p>
 
-            // Back button handling
-            const btnBack = document.getElementById('btn-back');
-            if(targetScreen === 'menu') {
-                btnBack.style.visibility = 'hidden';
-            } else {
-                btnBack.style.visibility = 'visible';
-                btnBack.onclick = () => nav('menu');
-            }
+                    <div class="interactive-box">
+                        <div class="box-label">Apel Siti</div>
+                        <div class="dashed-container">
+                            <span class="emoji-item">🍎</span><span class="emoji-item">🍎</span><span class="emoji-item">🍎</span><span class="emoji-item">🍎</span><span class="emoji-item">🍎</span>
+                        </div>
 
-            // Screen Specific Initializations
-            if(targetScreen === 'materi1') initMateri1();
-            if(targetScreen === 'materi2') initMateri2();
-            if(targetScreen === 'materi3') initMateri3();
-            if(targetScreen === 'menu') speak("Pilih petualanganmu hari ini.");
+                        <div class="box-label">Apel Beni</div>
+                        <div class="dashed-container">
+                            <span class="emoji-item">🍎</span><span class="emoji-item">🍎</span><span class="emoji-item">🍎</span>
+                        </div>
 
-            state.screen = targetScreen;
-        };
+                        <div class="equation" id="eq-pemantik">5 + 3 = ?</div>
 
-        const startGame = () => {
-            initAudio();
-            // Unlock speech api with empty phrase
-            if('speechSynthesis' in window) {
-                let u = new SpeechSynthesisUtterance('');
-                window.speechSynthesis.speak(u);
-            }
-            updateStarsUI();
-            nav('menu');
-        };
+                        <button class="btn-full btn-yellow" onclick="hintPemantik()" style="margin-bottom: 15px;">💡 Lihat petunjuk</button>
+                        <button class="btn-full btn-blue" onclick="switchTab('penjumlahan', document.getElementById('pill-penjumlahan'))">Ayo belajar penjumlahan →</button>
+                    </div>
+                    
+                    <div class="lisan-note">
+                        Pertanyaan lisan: Pernahkah kamu menggabungkan kelereng, pensil, atau mainanmu dengan milik teman?
+                    </div>
+                </div>
+            </div>
 
-        // Audio Toggle Button
-        document.getElementById('btn-sound').onclick = () => {
-            state.audioEnabled = !state.audioEnabled;
-            document.getElementById('icon-sound-on').classList.toggle('hidden', !state.audioEnabled);
-            document.getElementById('icon-sound-off').classList.toggle('hidden', state.audioEnabled);
-            if(!state.audioEnabled) window.speechSynthesis.cancel();
-            else sfx.click();
-        };
+            <!-- Tab Content: PENJUMLAHAN (Menu) -->
+            <div id="tab-penjumlahan" class="tab-content" style="display: none;">
+                <div class="content-card">
+                    <h2 class="card-title">➕ Ayo Belajar Penjumlahan</h2>
+                    <p class="card-desc">Pilih materi yang ingin kamu pelajari hari ini:</p>
+                    <div class="module-grid">
+                        <div class="module-card" onclick="openPage('page-materi-jumlah')">
+                            <div class="module-icon">🍓</div>
+                            <div class="module-title">Konsep Gabung</div>
+                        </div>
+                        <div class="module-card" onclick="openPage('page-simulasi')">
+                            <div class="module-icon">🧸</div>
+                            <div class="module-title">Benda Konkret</div>
+                        </div>
+                        <div class="module-card" onclick="openPage('page-garis-bilangan')" style="grid-column: span 2;">
+                            <div class="module-icon">🐸</div>
+                            <div class="module-title">Garis Bilangan</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        /* ==========================================================================
-           4. MATERI LOGIC
-           ========================================================================== */
-        
-        // Materi 1: Angka 1-20
-        const initMateri1 = () => {
-            const grid = document.getElementById('angka-grid');
-            grid.innerHTML = '';
-            for(let i=1; i<=20; i++){
-                const btn = document.createElement('button');
-                btn.className = 'bg-white border-2 border-blue-200 text-blue-600 font-bold text-2xl py-3 rounded-xl shadow-sm hover:bg-blue-50 active:scale-95 active:bg-blue-200 transition';
-                btn.innerText = i;
-                btn.onclick = () => {
-                    sfx.pop();
-                    speak(i.toString());
-                    // add visual effect
-                    btn.classList.add('bg-yellow-300', 'text-yellow-900', 'border-yellow-400');
-                    setTimeout(() => {
-                        btn.classList.remove('bg-yellow-300', 'text-yellow-900', 'border-yellow-400');
-                    }, 500);
-                };
-                grid.appendChild(btn);
-            }
-            speak("Mari mengenal angka satu sampai dua puluh. Tekan angkanya untuk mendengar suara Bimo.");
-        };
+            <!-- Tab Content: PENGURANGAN (Menu) -->
+            <div id="tab-pengurangan" class="tab-content" style="display: none;">
+                <div class="content-card">
+                    <h2 class="card-title">➖ Ayo Belajar Pengurangan</h2>
+                    <p class="card-desc">Pilih materi yang ingin kamu pelajari hari ini:</p>
+                    <div class="module-grid">
+                        <div class="module-card" onclick="openPage('page-materi-kurang')">
+                            <div class="module-icon">🍬</div>
+                            <div class="module-title">Konsep Ambil</div>
+                        </div>
+                        <div class="module-card" onclick="openPage('page-simulasi')">
+                            <div class="module-icon">🧸</div>
+                            <div class="module-title">Benda Konkret</div>
+                        </div>
+                        <div class="module-card" onclick="openPage('page-garis-bilangan')" style="grid-column: span 2;">
+                            <div class="module-icon">🐸</div>
+                            <div class="module-title">Garis Bilangan</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        // Materi 2: Penjumlahan
-        const initMateri2 = () => {
-            const s1 = document.getElementById('add-n1');
-            const s2 = document.getElementById('add-n2');
-            s1.innerHTML = ''; s2.innerHTML = '';
-            for(let i=1; i<=10; i++) {
-                s1.innerHTML += `<option value="${i}">${i}</option>`;
-                s2.innerHTML += `<option value="${i}">${i}</option>`;
-            }
-            document.getElementById('add-visual-stage').innerHTML = '';
-            document.getElementById('add-result-text').innerText = '';
-            speak("Pilih angka di kotak, lalu tekan tombol sama dengan.");
-        };
-
-        const simAddition = () => {
-            const n1 = parseInt(document.getElementById('add-n1').value);
-            const n2 = parseInt(document.getElementById('add-n2').value);
-            const res = n1 + n2;
-            const stage = document.getElementById('add-visual-stage');
-            
-            stage.innerHTML = generateSVGString('apple', n1) + '<div class="w-full text-center text-xl font-bold text-slate-300 my-1">+</div>' + generateSVGString('apple', n2);
-            document.getElementById('add-result-text').innerText = `${n1} + ${n2} = ${res}`;
-            
-            speak(`${n1} ditambah ${n2}, sama dengan ${res}.`);
-            sfx.pop();
-        };
-
-        // Materi 3: Pengurangan
-        const initMateri3 = () => {
-            const s1 = document.getElementById('sub-n1');
-            const s2 = document.getElementById('sub-n2');
-            s1.innerHTML = ''; s2.innerHTML = '';
-            for(let i=1; i<=20; i++) s1.innerHTML += `<option value="${i}">${i}</option>`;
-            // default
-            s1.value = 10;
-            updateSubSelect2();
-            s1.onchange = updateSubSelect2;
-            
-            document.getElementById('sub-visual-stage').innerHTML = '';
-            document.getElementById('sub-result-text').innerText = '';
-            speak("Pilih jumlah awal jeruk, lalu pilih berapa yang diambil.");
-        };
-
-        const updateSubSelect2 = () => {
-            const n1 = parseInt(document.getElementById('sub-n1').value);
-            const s2 = document.getElementById('sub-n2');
-            s2.innerHTML = '';
-            for(let i=1; i<=n1; i++) s2.innerHTML += `<option value="${i}">${i}</option>`;
-        };
-
-        const simSubtraction = () => {
-            const n1 = parseInt(document.getElementById('sub-n1').value);
-            const n2 = parseInt(document.getElementById('sub-n2').value);
-            const res = n1 - n2;
-            const stage = document.getElementById('sub-visual-stage');
-            
-            // Draw n1 items, but make n2 items look faded/removed
-            let html = generateSVGString('orange', res); // remaining
-            html += generateSVGString('orange', n2, 0.2); // removed
-            
-            stage.innerHTML = html;
-            document.getElementById('add-result-text');
-            document.getElementById('sub-result-text').innerText = `${n1} - ${n2} = ${res}`;
-            
-            speak(`${n1} dikurang ${n2}, sisa ${res}.`);
-            sfx.pop();
-        };
-
-        // Apperception
-        const runApperceptionAnim = () => {
-            sfx.pop();
-            const s1 = document.getElementById('app-stage-1');
-            const s2 = document.getElementById('app-stage-2');
-            s1.innerHTML = ''; s2.innerHTML = '';
-            
-            let count = 0;
-            const intv = setInterval(() => {
-                count++;
-                if(count <= 5) s1.innerHTML += generateSVGString('apple', 1);
-                else if (count <= 8) s2.innerHTML += generateSVGString('apple', 1);
-                else {
-                    clearInterval(intv);
-                    setTimeout(() => {
-                        speak("Lima apel, ditambah tiga apel, semuanya menjadi delapan apel.");
-                        s1.innerHTML = generateSVGString('apple', 8);
-                        s2.innerHTML = '';
-                        document.querySelector('#screen-apperception .text-3xl').innerText = "= 8";
-                    }, 1000);
-                }
-                sfx.pop();
-            }, 400);
-        };
-
-        /* ==========================================================================
-           5. INTERACTIVE ENGINE (Games, Quiz, Challenge)
-           ========================================================================== */
-        
-        let intSession = {
-            type: '', // game1, game2, game3, quiz, materi4, challenge
-            questions: [],
-            currIdx: 0,
-            score: 0,
-            objType: 'apple'
-        };
-
-        const generateQuestions = (type) => {
-            let qs = [];
-            const objects = ['apple', 'orange', 'star', 'candy'];
-            
-            if(type === 'game1' || type === 'materi4') {
-                // Counting / Latihan Berhitung (Mixed)
-                for(let i=0; i<5; i++) {
-                    const obj = objects[Math.floor(Math.random()*objects.length)];
-                    const isAdd = Math.random() > 0.5;
-                    if(isAdd || type==='game1') {
-                        let a = Math.floor(Math.random()*9)+1;
-                        let b = Math.floor(Math.random()*9)+1;
-                        if(type==='game1') { // Just count
-                            let total = a+b;
-                            qs.push({ q: `Berapa jumlah benda di bawah ini?`, v: generateSVGString(obj, total), ans: total, textAns: total, obj: obj });
-                        } else {
-                            qs.push({ q: `Berapa hasil dari ${a} + ${b}?`, v: generateSVGString(obj, a) + `<div class="mx-2 text-2xl font-bold">+</div>` + generateSVGString(obj, b), ans: a+b, textAns: a+b, obj: obj });
-                        }
-                    } else {
-                        let a = Math.floor(Math.random()*10)+10; // 10-19
-                        let b = Math.floor(Math.random()*9)+1;
-                        qs.push({ q: `Berapa hasil dari ${a} - ${b}?`, v: generateSVGString(obj, a-b) + generateSVGString(obj, b, 0.2), ans: a-b, textAns: a-b, obj: obj });
-                    }
-                }
-            } else if (type === 'game2') {
-                // Penjumlahan adventure
-                for(let i=0; i<5; i++) {
-                    let a = Math.floor(Math.random()*9)+1;
-                    let b = Math.floor(Math.random()*10)+1;
-                    qs.push({ q: `Bantu Bimo maju! ${a} + ${b} = ?`, v: SVGs.star, ans: a+b, textAns: a+b });
-                }
-            } else if (type === 'game3') {
-                // Pengurangan
-                for(let i=0; i<5; i++) {
-                    const obj = objects[Math.floor(Math.random()*objects.length)];
-                    let a = Math.floor(Math.random()*10)+10; 
-                    let b = Math.floor(Math.random()*8)+1;
-                    qs.push({ q: `Ada ${a} benda, lalu diambil ${b}. Sisa berapa?`, v: generateSVGString(obj, a-b) + generateSVGString(obj, b, 0.2), ans: a-b, textAns: a-b, obj: obj });
-                }
-            } else if (type === 'quiz') {
-                // Kuis Evaluasi (100 pts max, 20 per q)
-                for(let i=0; i<5; i++) {
-                    let isAdd = i % 2 === 0;
-                    let a = Math.floor(Math.random()*10)+5;
-                    let b = Math.floor(Math.random()*5)+1;
-                    let ans = isAdd ? a+b : a-b;
-                    let sign = isAdd ? '+' : '-';
-                    qs.push({ q: `Hasil dari ${a} ${sign} ${b} adalah?`, v: '', ans: ans, textAns: ans });
-                }
-            } else if (type === 'challenge') {
-                qs = [
-                    { q: "Bimo punya 10 permen, lalu beli 5 permen lagi. Berapa permen Bimo?", v: generateSVGString('candy', 10) + '<div class="mx-2 text-2xl font-bold">+</div>' + generateSVGString('candy', 5), ans: 15, textAns: 15 },
-                    { q: "Bimo punya 15 permen, lalu diberikan ke temannya 3 permen. Berapa sisa permen?", v: generateSVGString('candy', 12) + generateSVGString('candy', 3, 0.2), ans: 12, textAns: 12 }
-                ];
-            }
-            return qs;
-        };
-
-        const startInteractive = (type) => {
-            intSession = {
-                type: type,
-                questions: generateQuestions(type),
-                currIdx: 0,
-                score: 0
-            };
-            
-            let title = "Latihan";
-            if(type === 'game1') title = "Hitung Benda";
-            if(type === 'game2') title = "Petualangan BIMO";
-            if(type === 'game3') title = "Misi Pengurangan";
-            if(type === 'quiz') title = "Kuis Evaluasi";
-            if(type === 'challenge') title = "Misi Belanja";
-            if(type === 'materi4') title = "Latihan Campuran";
-            
-            document.getElementById('int-title').innerText = title;
-            nav('interactive');
-            renderInteractiveQuestion();
-        };
-
-        const renderInteractiveQuestion = () => {
-            const qData = intSession.questions[intSession.currIdx];
-            document.getElementById('int-progress').innerText = `${intSession.currIdx + 1} / ${intSession.questions.length}`;
-            document.getElementById('int-question').innerText = qData.q;
-            document.getElementById('int-visuals').innerHTML = qData.v;
-            
-            // Generate Options
-            let opts = [qData.ans];
-            while(opts.length < 4) {
-                let wrong = qData.ans + Math.floor(Math.random()*7) - 3;
-                if(wrong > 0 && wrong <= 20 && !opts.includes(wrong)) opts.push(wrong);
-            }
-            // Shuffle
-            opts = opts.sort(() => Math.random() - 0.5);
-            
-            const optContainer = document.getElementById('int-options');
-            optContainer.innerHTML = '';
-            
-            opts.forEach((opt) => {
-                const btn = document.createElement('button');
-                btn.className = 'bg-white border-b-4 border-sky-300 text-sky-800 text-2xl font-bold py-6 rounded-2xl shadow-sm hover:bg-sky-50 active:translate-y-1 active:border-b-0 transition flex justify-center items-center';
-                btn.innerText = opt;
-                btn.onclick = () => handleAnswer(opt, qData.ans, qData);
-                optContainer.appendChild(btn);
-            });
-
-            if(intSession.type === 'quiz' || intSession.type === 'challenge') speakInteractiveQuestion();
-        };
-
-        const speakInteractiveQuestion = () => {
-            speak(intSession.questions[intSession.currIdx].q);
-        };
-
-        const handleAnswer = (selected, correct, qData) => {
-            const isCorrect = (selected === correct);
-            const modal = document.getElementById('modal-feedback');
-            const mTitle = document.getElementById('modal-title');
-            const mDesc = document.getElementById('modal-desc');
-            const mIcon = document.getElementById('modal-icon');
-            const mBtn = document.getElementById('btn-modal-next');
-            const mContent = document.getElementById('modal-content');
-
-            if(isCorrect) {
-                sfx.correct();
-                mIcon.innerText = "🌟";
-                mTitle.innerText = "Benar!";
-                mTitle.className = "text-3xl font-bold text-green-500 mb-2";
-                mDesc.innerText = `Hebat! Jawabannya adalah ${correct}.`;
-                intSession.score += (intSession.type === 'quiz' ? 20 : 10);
-                addStars(1);
-            } else {
-                sfx.wrong();
-                mIcon.innerText = "😅";
-                mTitle.innerText = "Ups, Kurang Tepat";
-                mTitle.className = "text-3xl font-bold text-orange-500 mb-2";
-                mDesc.innerText = `Jawaban yang benar adalah ${correct}. Tetap semangat ya!`;
-            }
-
-            modal.classList.remove('hidden');
-            // small animation
-            mContent.classList.remove('scale-95');
-            mContent.classList.add('scale-100');
-
-            mBtn.onclick = () => {
-                sfx.click();
-                modal.classList.add('hidden');
-                mContent.classList.remove('scale-100');
-                mContent.classList.add('scale-95');
-                
-                intSession.currIdx++;
-                if(intSession.currIdx < intSession.questions.length) {
-                    renderInteractiveQuestion();
-                } else {
-                    finishInteractive();
-                }
-            };
-        };
-
-        const finishInteractive = () => {
-            nav('result');
-            const sTitle = document.getElementById('result-title');
-            const sScore = document.getElementById('result-score');
-            const sMsg = document.getElementById('result-msg');
-            const btnRetry = document.getElementById('btn-result-retry');
-            
-            btnRetry.onclick = () => { sfx.click(); startInteractive(intSession.type); };
-
-            if(intSession.type === 'quiz') {
-                sScore.innerText = intSession.score;
-                if(intSession.score >= 80) {
-                    sTitle.innerText = "Luar Biasa!";
-                    sMsg.innerText = "Kamu mendapatkan Bintang Juara Matematika!";
-                    sfx.win();
-                    triggerConfetti();
-                    speak("Luar biasa! Kamu juara matematika!");
-                } else {
-                    sTitle.innerText = "Bagus Sekali!";
-                    sMsg.innerText = "Terus berlatih ya biar makin jago!";
-                    sfx.correct();
-                    speak("Bagus sekali. Terus berlatih ya!");
-                }
-            } else {
-                // Game mode
-                sScore.innerText = intSession.score;
-                sTitle.innerText = "Permainan Selesai!";
-                sMsg.innerText = `Kamu berhasil mengumpulkan ${intSession.score} poin!`;
-                sfx.win();
-                triggerConfetti();
-                speak(`Hore! Permainan selesai. Kamu dapat ${intSession.score} poin.`);
-            }
-        };
-
-        /* ==========================================================================
-           6. EFFECTS & EXTRAS
-           ========================================================================== */
-        
-        // Simple Canvas Confetti
-        const triggerConfetti = () => {
-            const canvas = document.getElementById('confetti');
-            canvas.classList.remove('hidden');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            const particles = [];
-            for(let i=0; i<100; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    w: Math.random() * 10 + 5,
-                    h: Math.random() * 10 + 5,
-                    color: `hsl(${Math.random()*360}, 100%, 50%)`,
-                    vy: Math.random() * 5 + 2,
-                    vx: Math.random() * 4 - 2,
-                    rot: Math.random() * 360,
-                    rotSpeed: Math.random() * 10 - 5
-                });
-            }
-
-            const render = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                let active = false;
-                particles.forEach(p => {
-                    p.y += p.vy;
-                    p.x += p.vx;
-                    p.rot += p.rotSpeed;
-                    if(p.y < canvas.height) active = true;
-                    ctx.save();
-                    ctx.translate(p.x, p.y);
-                    ctx.rotate(p.rot * Math.PI / 180);
-                    ctx.fillStyle = p.color;
-                    ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-                    ctx.restore();
-                });
-                if(active) requestAnimationFrame(render);
-                else canvas.classList.add('hidden');
-            };
-            render();
-        };
-
-        // Initialize state UI
-        updateStarsUI();
-
-    </script>
-</body>
-</html>
+            <!-- Tab Content: LATIHAN (Menu Games & Kuis) -->
+            <div id="tab-latihan" class="tab-content" style="display: none;">
+                <div class="content-card">
+                    <h2 class="card-title">🎯 Ayo Berlatih</h2>
+                    <p class="card-desc">Pilih permainan seru untuk menguji kemampuanmu!</p>
+                    <div class="module-grid">
+                        <div class="module-card" onclick="openPage('page-game-balon')">
+                            <div class="module-icon">🎈</div>
+                            <div class="module-title">Tangkap Balon</div>
+                        </div>
+     
